@@ -13,7 +13,21 @@ let user
 const plugin = rest({Model: User})
 
 const app = appMock()
-app.get('/api', function(req, res) {
+
+app.get('/users/:id', function(req, res) {
+  plugin(req, res)
+    .then(() => {
+      res.json(res.body)
+    })
+    .catch(err => {
+      console.log(err)
+      res
+        .status(500)
+        .json(err)
+    })
+})
+
+app.get('/users', function(req, res) {
   plugin(req, res)
     .then(() => {
       res.json(res.body)
@@ -80,7 +94,26 @@ describe('netiam', () => {
 
     it('should fetch user', done => {
       request(app)
-        .get('/api')
+        .get(`/users/${user.id}`)
+        .set('Accept', 'application/json')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => {
+          res.body.should.have.properties([
+            'id',
+            'email',
+            'username',
+            'birthday',
+            'createdAt',
+            'updatedAt'
+          ])
+        })
+        .end(done)
+    })
+
+    it('should fetch users', done => {
+      request(app)
+        .get('/users')
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -100,7 +133,34 @@ describe('netiam', () => {
 
     it('should fetch user w/ project', done => {
       request(app)
-        .get('/api?include=Project')
+        .get(`/users/${user.id}?include=Project`)
+        .set('Accept', 'application/json')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => {
+          res.body.should.have.properties([
+            'id',
+            'email',
+            'username',
+            'birthday',
+            'createdAt',
+            'updatedAt',
+            'Projects'
+          ])
+          res.body.Projects.should.have.length(1)
+          res.body.Projects[0].should.have.properties([
+            'id',
+            'name',
+            'createdAt',
+            'updatedAt'
+          ])
+        })
+        .end(done)
+    })
+
+    it('should fetch users w/ project', done => {
+      request(app)
+        .get('/users?include=Project')
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -111,6 +171,14 @@ describe('netiam', () => {
             'email',
             'username',
             'birthday',
+            'createdAt',
+            'updatedAt',
+            'Projects'
+          ])
+          res.body[0].Projects.should.have.length(1)
+          res.body[0].Projects[0].should.have.properties([
+            'id',
+            'name',
             'createdAt',
             'updatedAt'
           ])

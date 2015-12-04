@@ -10,6 +10,7 @@ import {
 
 export default function({
   Model,
+  idField = 'id',
   idParam = 'id',
   relationship} = {}) {
 
@@ -33,6 +34,7 @@ export default function({
     if (method === 'GET' && isList) {
       return list({
         Model,
+        relationship,
         req,
         res
       })
@@ -41,6 +43,18 @@ export default function({
     if (method === 'POST') {
       return create({
         Model,
+        relationship,
+        req,
+        res
+      })
+    }
+
+    if (method === 'GET') {
+      return read({
+        Model,
+        idField,
+        idParam,
+        relationship,
         req,
         res
       })
@@ -49,6 +63,9 @@ export default function({
     if (method === 'HEAD') {
       return read({
         Model,
+        idField,
+        idParam,
+        relationship,
         req,
         res
       })
@@ -57,6 +74,9 @@ export default function({
     if (method === 'PATCH' || method === 'PUT') {
       return update({
         Model,
+        idField,
+        idParam,
+        relationship,
         req,
         res
       })
@@ -65,6 +85,8 @@ export default function({
     if (method === 'DELETE') {
       return remove({
         Model,
+        idParam,
+        relationship,
         req,
         res
       })
