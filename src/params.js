@@ -18,7 +18,7 @@ export function normalize({req, idField = 'id', limit = 10}) {
     query.filter = req.query.filter
   }
 
-  // Property expansion
+  // Embeded documents
   if (_.isString(req.query.include)) {
     query.include = req.query.include.split(',')
   }
@@ -43,4 +43,42 @@ export function normalize({req, idField = 'id', limit = 10}) {
   }
 
   return query
+}
+
+function includeObject({Model, parts, obj = {}}) {
+  const path = parts.shift()
+  obj.model = Model.modelManager.getModel(path)
+
+  if (parts.length === 0) {
+    return obj
+  }
+
+  const nestedObject = {}
+  obj.include = [nestedObject]
+
+  includeObject({
+    Model,
+    parts,
+    obj: nestedObject
+  })
+
+  return obj
+}
+
+export function include({Model, param}) {
+  if (!_.isArray(param)) {
+    throw new Error(`The include parameter ${param} is not an array`)
+  }
+  if (param.length === 0) {
+    return
+  }
+
+  return param.map(path => {
+    const parts = path.split('.')
+
+    return includeObject({
+      Model,
+      parts
+    })
+  })
 }
