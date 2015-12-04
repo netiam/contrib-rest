@@ -1,4 +1,3 @@
-import fs from 'fs'
 import Sequelize from 'sequelize'
 
 export const db = new Sequelize('netiam', 'netiam', 'netiam', {
@@ -15,5 +14,8 @@ export function setup(done) {
 }
 
 export function teardown(done) {
-  fs.unlink('./test/db.sqlite', done)
+  db
+    .drop()
+    .then(() => done())
+    .catch(done)
 }
