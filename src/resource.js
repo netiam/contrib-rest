@@ -1,18 +1,22 @@
-import {normalize} from './params'
+import {
+  normalize,
+  include
+} from './params'
 
 export function list({Model, req, res}) {
   const query = normalize({req})
-  const include = query.include.map(include => {
-    return Model.modelManager.getModel(include)
-  })
   return Model
     .findAll({
       order: query.order,
       limit: query.limit,
       offset: query.offset,
-      include
+      include: include({
+        Model,
+        param: query.include
+      })
     })
-    .then(documents => {
+    .
+    then(documents => {
       res
         .status(200)
         .body = documents.map(document => document.get({plain: true}))
@@ -25,9 +29,6 @@ export function create({Model, req, res}) {
 
 export function read({Model, idParam, idField, req, res}) {
   const query = normalize({req})
-  const include = query.include.map(include => {
-    return Model.modelManager.getModel(include)
-  })
   return Model
     .find({
       where: {
@@ -36,7 +37,10 @@ export function read({Model, idParam, idField, req, res}) {
       order: query.order,
       limit: query.limit,
       offset: query.offset,
-      include
+      include: include({
+        Model,
+        param: query.include
+      })
     })
     .then(document => {
       res
