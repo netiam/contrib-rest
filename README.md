@@ -10,11 +10,7 @@
 
 ```js
 netiam()
-  .rest({
-    Model: User
-    idField: 'id',
-    idParam: 'id'}
-  })
+  .rest({Model: User})
   .json()
 ```
 
