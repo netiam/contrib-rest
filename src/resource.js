@@ -1,3 +1,6 @@
+import _ from 'lodash'
+import Promise from 'bluebird'
+import Sequelize from 'sequelize'
 import {
   normalize,
   include
@@ -24,19 +27,41 @@ export function list({Model, req, res}) {
 }
 
 export function create({Model, req, res}) {
-  const query = normalize({req})
+  let body = req.body
+  if (_.isObject(req.body) && !_.isArray(req.body)) {
+    body = [body]
+  }
+  if (!_.isArray(body)) {
+    return Promise.reject(
+      new Error('Request body must either be an array of objects or a single object'))
+  }
+  if (!body.every(_.isObject)) {
+    return Promise.reject(
+      new Error('Request body must be an array of objects'))
+  }
+
+  return Model
+    .bulkCreate(body)
+    .then(documents => {
+      if (documents.length === 1) {
+        return res
+          .status(201)
+          .body = documents[0].get({plain: true})
+      }
+
+      res
+        .status(201)
+        .body = documents.map(document => document.get({plain: true}))
+    })
 }
 
 export function read({Model, idParam, idField, req, res}) {
   const query = normalize({req})
   return Model
-    .find({
+    .findOne({
       where: {
         [idField]: req.params[idParam]
       },
-      order: query.order,
-      limit: query.limit,
-      offset: query.offset,
       include: include({
         Model,
         param: query.include
@@ -45,14 +70,49 @@ export function read({Model, idParam, idField, req, res}) {
     .then(document => {
       res
         .status(200)
-        .body = document.get({plain: true})
+        .body = document.toJSON()
     })
 }
 
-export function update({Model, req, res}) {
-  const query = normalize({req})
+export function update({Model, idField, idParam, req, res}) {
+  return Model.sequelize
+    .transaction(transaction => {
+      return Model
+        .findOrCreate({
+          where: {
+            [idField]: req.params[idParam]
+          },
+          defaults: req.body,
+          transaction
+        })
+        .spread((document, created) => {
+          if (created) {
+            return res
+              .status(201)
+              .body = document.toJSON()
+          }
+
+          return document.update(req.body, {transaction})
+        })
+    })
+    .then(document => {
+      res
+        .status(200)
+        .body = document
+    })
 }
 
-export function remove({Model, req, res}) {
-  const query = normalize({req})
+export function remove({Model, idParam, idField, req, res}) {
+  return Model
+    .findOne({
+      where: {
+        [idField]: req.params[idParam]
+      }
+    })
+    .then(document => {
+      return document.destroy()
+    })
+    .then(() => {
+      res.status(204)
+    })
 }

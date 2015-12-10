@@ -1,14 +1,34 @@
+import request from 'supertest'
+import appMock from './utils/app'
+import userFixture from './fixtures/user'
 import User from './models/user'
-import Project from './models/project'
 import {
   setup,
   teardown
 } from './utils/db'
+import rest from '../src/rest'
 
 let user
 
+const plugin = rest({Model: User})
+
+const app = appMock()
+
+app.delete('/users/:id', function(req, res) {
+  plugin(req, res)
+    .then(() => {
+      res.json(res.body)
+    })
+    .catch(err => {
+      console.log(err)
+      res
+        .status(500)
+        .json(err)
+    })
+})
+
 describe('netiam', () => {
-  describe('REST - models', () => {
+  describe('REST - delete', () => {
 
     before(setup)
     after(teardown)
@@ -35,28 +55,15 @@ describe('netiam', () => {
         .catch(done)
     })
 
-    it('should create a project', done => {
-      Project
-        .create({
-          name: 'awesome'
+    it('should delete a user', done => {
+      request(app)
+        .delete(`/users/${user.id}`)
+        .set('Accept', 'application/json')
+        .expect(204)
+        .expect(res => {
+          res.body.should.be.empty()
         })
-        .then(project => {
-          project.get({plain: true}).should.have.properties([
-            'id',
-            'name',
-            'createdAt',
-            'updatedAt'
-          ])
-          return user.addProject(project)
-        })
-        .then(() => {
-          return user.getProjects()
-        })
-        .then(projects => {
-          projects.length.should.eql(1)
-          done()
-        })
-        .catch(done)
+        .end(done)
     })
 
   })

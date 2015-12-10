@@ -85,6 +85,7 @@ export default function({
     if (method === 'DELETE') {
       return remove({
         Model,
+        idField,
         idParam,
         relationship,
         req,

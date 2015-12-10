@@ -12,7 +12,7 @@ import {
 let user
 
 describe('netiam', () => {
-  describe('params', () => {
+  describe('REST - params', () => {
 
     before(setup)
     after(teardown)

@@ -41,7 +41,7 @@ app.get('/users', function(req, res) {
 })
 
 describe('netiam', () => {
-  describe('REST', () => {
+  describe('REST - middleware', () => {
 
     before(setup)
     after(teardown)
