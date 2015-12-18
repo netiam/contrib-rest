@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
-import Sequelize from 'sequelize'
 import {
   normalize,
   include
@@ -28,7 +27,7 @@ export function list({Model, req, res}) {
 
 export function create({Model, req, res}) {
   let body = req.body
-  if (_.isObject(req.body) && !_.isArray(req.body)) {
+  if (_.isObject(body) && !_.isArray(body)) {
     body = [body]
   }
   if (!_.isArray(body)) {
@@ -75,6 +74,12 @@ export function read({Model, idParam, idField, req, res}) {
 }
 
 export function update({Model, idField, idParam, req, res}) {
+  const body = req.body
+  if (!_.isObject(body)) {
+    return Promise.reject(
+      new Error('Request body must be an object'))
+  }
+
   return Model.sequelize
     .transaction(transaction => {
       return Model
@@ -103,16 +108,19 @@ export function update({Model, idField, idParam, req, res}) {
 }
 
 export function remove({Model, idParam, idField, req, res}) {
-  return Model
-    .findOne({
-      where: {
-        [idField]: req.params[idParam]
-      }
-    })
-    .then(document => {
-      return document.destroy()
-    })
-    .then(() => {
-      res.status(204)
+  return Model.sequelize
+    .transaction(transaction => {
+      return Model
+        .findOne({
+          where: {
+            [idField]: req.params[idParam]
+          }
+        })
+        .then(document => {
+          return document.destroy()
+        })
+        .then(() => {
+          res.status(204)
+        })
     })
 }
