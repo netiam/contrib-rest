@@ -20,6 +20,12 @@ function fetchAll({model, req, res}) {
         .status(200)
         .body = documents.map(document => document.get({plain: true}))
     })
+    .then(() => {
+      return model.count()
+    })
+    .then(count => {
+      res.meta = Object.assign({}, res.meta, {count})
+    })
 }
 
 function fetchOne({model, idParam, idField, req, res}) {
