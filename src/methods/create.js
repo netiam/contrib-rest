@@ -21,11 +21,11 @@ export default function({model, req, res}) {
       if (documents.length === 1) {
         return res
           .status(201)
-          .body = documents[0].get({plain: true})
+          .body = documents[0].toJSON()
       }
 
       res
         .status(201)
-        .body = documents.map(document => document.get({plain: true}))
+        .body = documents.map(document => document.toJSON())
     })
 }

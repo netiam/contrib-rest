@@ -18,7 +18,7 @@ function fetchAll({model, req, res}) {
     .then(documents => {
       res
         .status(200)
-        .body = documents.map(document => document.get({plain: true}))
+        .body = documents.map(document => document.toJSON())
     })
     .then(() => {
       return model.count()
