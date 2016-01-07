@@ -1,12 +1,9 @@
 import Promise from 'bluebird'
 import {HAS_MANY} from './relationships'
-import {
-  list,
-  create,
-  read,
-  update,
-  remove
-} from './resource'
+import create from './methods/create'
+import read from './methods/read'
+import update from './methods/update'
+import del from './methods/delete'
 
 export default function({
   model,
@@ -32,7 +29,7 @@ export default function({
     }
 
     if (method === 'GET' && isList) {
-      return list({
+      return read({
         model,
         relationship,
         req,
@@ -83,7 +80,7 @@ export default function({
     }
 
     if (method === 'DELETE') {
-      return remove({
+      return del({
         model,
         idField,
         idParam,
