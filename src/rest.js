@@ -9,7 +9,7 @@ import {
 } from './resource'
 
 export default function({
-  Model,
+  model,
   idField = 'id',
   idParam = 'id',
   relationship} = {}) {
@@ -33,7 +33,7 @@ export default function({
 
     if (method === 'GET' && isList) {
       return list({
-        Model,
+        model,
         relationship,
         req,
         res
@@ -42,7 +42,7 @@ export default function({
 
     if (method === 'POST') {
       return create({
-        Model,
+        model,
         relationship,
         req,
         res
@@ -51,7 +51,7 @@ export default function({
 
     if (method === 'GET') {
       return read({
-        Model,
+        model,
         idField,
         idParam,
         relationship,
@@ -62,7 +62,7 @@ export default function({
 
     if (method === 'HEAD') {
       return read({
-        Model,
+        model,
         idField,
         idParam,
         relationship,
@@ -73,7 +73,7 @@ export default function({
 
     if (method === 'PATCH' || method === 'PUT') {
       return update({
-        Model,
+        model,
         idField,
         idParam,
         relationship,
@@ -84,7 +84,7 @@ export default function({
 
     if (method === 'DELETE') {
       return remove({
-        Model,
+        model,
         idField,
         idParam,
         relationship,

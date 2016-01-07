@@ -10,7 +10,7 @@ import rest from '../src/rest'
 
 let user
 
-const plugin = rest({Model: User})
+const plugin = rest({model: User})
 
 const app = appMock()
 

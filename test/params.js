@@ -19,7 +19,7 @@ describe('netiam', () => {
 
     it('should not include anything', () => {
       const associations = include({
-        Model: User,
+        model: User,
         param: []
       })
 
@@ -29,7 +29,7 @@ describe('netiam', () => {
     it('should throw error because of invalid include param', () => {
       (function() {
         include({
-          Model: User,
+          model: User,
           param: null
         })
       }).should.throw()
@@ -37,7 +37,7 @@ describe('netiam', () => {
 
     it('should include a document', () => {
       const associations = include({
-        Model: User,
+        model: User,
         param: 'Project'.split(',')
       })
 
@@ -47,7 +47,7 @@ describe('netiam', () => {
 
     it('should include two documents', () => {
       const associations = include({
-        Model: User,
+        model: User,
         param: 'Project,User'.split(',')
       })
 
@@ -58,7 +58,7 @@ describe('netiam', () => {
 
     it('should include a nested document', () => {
       const associations = include({
-        Model: User,
+        model: User,
         param: 'Project.User'.split(',')
       })
 

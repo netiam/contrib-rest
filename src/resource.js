@@ -5,15 +5,15 @@ import {
   include
 } from './params'
 
-export function list({Model, req, res}) {
+export function list({model, req, res}) {
   const query = normalize({req})
-  return Model
+  return model
     .findAll({
       order: query.order,
       limit: query.limit,
       offset: query.offset,
       include: include({
-        Model,
+        model,
         param: query.include
       })
     })
@@ -25,7 +25,7 @@ export function list({Model, req, res}) {
     })
 }
 
-export function create({Model, req, res}) {
+export function create({model, req, res}) {
   let body = req.body
   if (_.isObject(body) && !_.isArray(body)) {
     body = [body]
@@ -39,7 +39,7 @@ export function create({Model, req, res}) {
       new Error('Request body must be an array of objects'))
   }
 
-  return Model
+  return model
     .bulkCreate(body)
     .then(documents => {
       if (documents.length === 1) {
@@ -54,15 +54,15 @@ export function create({Model, req, res}) {
     })
 }
 
-export function read({Model, idParam, idField, req, res}) {
+export function read({model, idParam, idField, req, res}) {
   const query = normalize({req})
-  return Model
+  return model
     .findOne({
       where: {
         [idField]: req.params[idParam]
       },
       include: include({
-        Model,
+        model,
         param: query.include
       })
     })
@@ -73,16 +73,16 @@ export function read({Model, idParam, idField, req, res}) {
     })
 }
 
-export function update({Model, idField, idParam, req, res}) {
+export function update({model, idField, idParam, req, res}) {
   const body = req.body
   if (!_.isObject(body)) {
     return Promise.reject(
       new Error('Request body must be an object'))
   }
 
-  return Model.sequelize
+  return model.sequelize
     .transaction(transaction => {
-      return Model
+      return model
         .findOrCreate({
           where: {
             [idField]: req.params[idParam]
@@ -107,10 +107,10 @@ export function update({Model, idField, idParam, req, res}) {
     })
 }
 
-export function remove({Model, idParam, idField, req, res}) {
-  return Model.sequelize
+export function remove({model, idParam, idField, req, res}) {
+  return model.sequelize
     .transaction(transaction => {
-      return Model
+      return model
         .findOne({
           where: {
             [idField]: req.params[idParam]

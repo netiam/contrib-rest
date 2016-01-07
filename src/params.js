@@ -45,9 +45,9 @@ export function normalize({req, idField = 'id', limit = 10}) {
   return query
 }
 
-function includeObject({Model, parts, obj = {}}) {
+function includeObject({model, parts, obj = {}}) {
   const path = parts.shift()
-  obj.model = Model.modelManager.getModel(path)
+  obj.model = model.modelManager.getModel(path)
 
   if (parts.length === 0) {
     return obj
@@ -57,7 +57,7 @@ function includeObject({Model, parts, obj = {}}) {
   obj.include = [nestedObject]
 
   includeObject({
-    Model,
+    model,
     parts,
     obj: nestedObject
   })
@@ -65,7 +65,7 @@ function includeObject({Model, parts, obj = {}}) {
   return obj
 }
 
-export function include({Model, param}) {
+export function include({model, param}) {
   if (!_.isArray(param)) {
     throw new Error(`The include parameter ${param} is not an array`)
   }
@@ -77,7 +77,7 @@ export function include({Model, param}) {
     const parts = path.split('.')
 
     return includeObject({
-      Model,
+      model,
       parts
     })
   })
