@@ -1,9 +1,9 @@
 /**
  * @type {Symbol}
  */
-export const ONE_TO_MANY = Symbol('one-to-many')
+export const HAS_MANY = Symbol('has many')
 
 /**
  * @type {Symbol}
  */
-export const MANY_TO_ONE = Symbol('many-to-one')
+export const BELONGS_TO = Symbol('belongs to')

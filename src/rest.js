@@ -1,5 +1,5 @@
 import Promise from 'bluebird'
-import {ONE_TO_MANY} from './relationships'
+import {HAS_MANY} from './relationships'
 import {
   list,
   create,
@@ -22,7 +22,7 @@ export default function({
       isList = true
     }
 
-    if (relationship && relationship.type === ONE_TO_MANY) {
+    if (relationship && relationship.type === HAS_MANY) {
       if (req[idParam] === relationship.idParam) {
         throw new Error('The relationship "idParam" must not match the base "idParam"')
       }
