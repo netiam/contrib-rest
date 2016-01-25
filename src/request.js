@@ -1,9 +1,7 @@
 import _ from 'lodash'
+import qf from 'netiam-filter'
 
-const ORDER_ASC = 'ASC'
-const ORDER_DSC = 'DSC'
-
-export default function() {
+export default function(req) {
 
 }
 
@@ -30,7 +28,7 @@ export function fields(dict) {
     return {}
   }
 
-  return _.object(
+  return _.fromPairs(
     _.map(dict, (val, field) => {
       if (!validateParamValue(val)) {
         return null
@@ -40,6 +38,9 @@ export function fields(dict) {
     })
   )
 }
+
+const ORDER_ASC = 'ASC'
+const ORDER_DSC = 'DSC'
 
 export function sort(str) {
   if (!validateParamValue(str)) {
@@ -111,6 +112,6 @@ export function page(dict) {
   }
 }
 
-export function filter() {
-
+export function filter(str) {
+  return qf(str)
 }
