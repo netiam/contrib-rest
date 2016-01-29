@@ -1,13 +1,22 @@
 import url from 'url'
+import User from '../models/user'
+import {
+  setup,
+  teardown
+} from '../utils/db'
 import {
   fields,
+  filter,
   include,
-  sort,
-  page
+  page,
+  sort
 } from '../../src/request'
 
 describe('netiam', () => {
   describe('REST - request parts', () => {
+
+    before(setup)
+    after(teardown)
 
     it('should parse include', () => {
       let struct
@@ -168,6 +177,19 @@ describe('netiam', () => {
       struct.should.be.Object()
       struct.limit = 10
       struct.offset = 0
+    })
+
+    it('should parse filter', done => {
+      const f = filter('id EQ  \'1\' AND (username EQ \'eliias\' OR birthday GT 1985)')
+      User
+        .findAll({
+          where: f.toObject()
+        })
+        .then(users => {
+          console.log(users)
+          done()
+        })
+        .catch(done)
     })
 
   })
