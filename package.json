@@ -16,9 +16,9 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
+    "bluebird": "^3.2.2",
     "lodash": "^4.2.1",
     "netiam-filter": "^1.1.0",
-    "bluebird": "^3.2.2",
     "sequelize": "^3.17.3"
   },
   "devDependencies": {
