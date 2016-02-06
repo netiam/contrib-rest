@@ -185,10 +185,7 @@ describe('netiam', () => {
         .findAll({
           where: f.toObject()
         })
-        .then(users => {
-          console.log(users)
-          done()
-        })
+        .then(users => done())
         .catch(done)
     })
 
