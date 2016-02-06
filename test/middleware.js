@@ -131,7 +131,7 @@ describe('netiam', () => {
         .end(done)
     })
 
-    it('should fetch user w/ project', done => {
+    it.skip('should fetch user w/ project', done => {
       request(app)
         .get(`/users/${user.id}?include=Project`)
         .set('Accept', 'application/json')
@@ -158,7 +158,7 @@ describe('netiam', () => {
         .end(done)
     })
 
-    it('should fetch users w/ project', done => {
+    it.skip('should fetch users w/ project', done => {
       request(app)
         .get('/users?include=Project')
         .set('Accept', 'application/json')

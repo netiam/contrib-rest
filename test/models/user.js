@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize'
 import {db} from '../utils/db'
 import Project from './project'
+import Profile from './profile'
 
 const User = db.define('User', {
   id: {
@@ -20,7 +21,13 @@ const User = db.define('User', {
   birthday: Sequelize.DATE
 })
 
-Project.belongsTo(User)
-User.hasMany(Project)
+User.hasMany(Project, {
+  as: 'projects',
+  foreignKey: 'owner'
+})
+User.hasOne(Profile, {
+  as: 'profile',
+  foreignkey: 'user'
+})
 
 export default User
