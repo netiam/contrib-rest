@@ -1,9 +1,13 @@
 import Promise from 'bluebird'
+import Sequelize from 'sequelize'
 import {HAS_MANY} from './relationships'
 import create from './methods/create'
 import read from './methods/read'
 import update from './methods/update'
 import del from './methods/delete'
+import mixinJSONApi from './mixins/jsonapi'
+
+mixinJSONApi(Sequelize)
 
 export default function({
   model,
