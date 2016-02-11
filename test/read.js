@@ -84,7 +84,7 @@ describe('netiam', () => {
         .expect(res => {
           res.body.should.be.an.Object()
           res.body.should.have.properties(['data'])
-          console.log(util.inspect(res.body, {depth: null}))
+          //console.log(util.inspect(res.body, {depth: null}))
         })
         .end(done)
     })
