@@ -42,21 +42,22 @@ function fromDocument({document}) {
               return
             }
 
-            if (_.isArray(data)) {
-              const list = _.map(data, item => item.data)
-              included.push(...list)
-            } else if (_.isObject(data)) {
+            if (_.isArray(data.data)) {
+              included.push(...data.data)
+            } else if (_.isObject(data.data)) {
               included.push(data.data)
+            } else {
+              throw new Error('"data" has invalid type. Must be of type "Array" or "Object"')
             }
 
-            if (_.isArray(data)) {
-              data = _.map(data, item => {
+            if (_.isArray(data.data)) {
+              data = _.map(data.data, item => {
                 return {
-                  id: item.data.id,
-                  type: item.data.type
+                  id: item.id,
+                  type: item.type
                 }
               })
-            } else if (_.isObject(data)) {
+            } else if (_.isObject(data.data)) {
               data = {
                 id: data.data.id,
                 type: data.data.type
@@ -105,7 +106,14 @@ export function from({documents}) {
   if (_.isArray(documents)) {
     return Promise.all(
       _.map(documents, document => fromDocument({document}))
-    )
+    ).then(documents => {
+      return {
+        data: _.map(documents, document => document.data),
+        included: _.reduce(documents, (included, document) => {
+          return included.concat(document.included)
+        }, [])
+      }
+    })
   }
 
   if (_.isObject(documents)) {
