@@ -46,21 +46,23 @@ function resource({document, model, included}) {
     const data = document[key]
     const relationshipModel = model.associations[key].target
     if (_.isArray(data)) {
-      relationships[key] = _.map(data, document => {
-        const id = getId({
-          document,
-          model: relationshipModel
+      relationships[key] = {
+        data: _.map(data, document => {
+          const id = getId({
+            document,
+            model: relationshipModel
+          })
+          included[id] = resource({
+            document,
+            model: relationshipModel,
+            included
+          })
+          return resourceIdentifier({
+            document,
+            model: relationshipModel
+          })
         })
-        included[id] = resource({
-          document,
-          model: relationshipModel,
-          included
-        })
-        return resourceIdentifier({
-          document,
-          model: relationshipModel
-        })
-      })
+      }
     } else {
       const id = getId({
         document: data,
@@ -71,10 +73,12 @@ function resource({document, model, included}) {
         model: relationshipModel,
         included
       })
-      return resourceIdentifier({
-        document: data,
-        model: relationshipModel
-      })
+      relationships[key] = {
+        data: resourceIdentifier({
+          document: data,
+          model: relationshipModel
+        })
+      }
     }
   })
 
