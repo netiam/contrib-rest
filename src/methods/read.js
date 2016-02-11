@@ -2,10 +2,12 @@ import {
   normalize,
   include
 } from '../params'
+import {from} from '../ds'
+import Promise from 'bluebird'
 
 function fetchAll({model, req, res}) {
   const query = normalize({req})
-  return model
+  const documents = model
     .findAll({
       order: query.order,
       limit: query.limit,
@@ -15,17 +17,18 @@ function fetchAll({model, req, res}) {
         param: query.include
       })
     })
+    .then(documents => from({documents}))
     .then(documents => {
       res
         .status(200)
-        .body = documents.map(document => document.toJSON())
+        .body = documents
     })
-    .then(() => {
-      return model.count()
-    })
+  const count = model
+    .count()
     .then(count => {
       res.meta = Object.assign({}, res.meta, {count})
     })
+  return Promise.all([documents, count])
 }
 
 function fetchOne({model, idParam, idField, req, res}) {
@@ -40,10 +43,11 @@ function fetchOne({model, idParam, idField, req, res}) {
         param: query.include
       })
     })
+    .then(document => document.toJSONApi())
     .then(document => {
       res
         .status(200)
-        .body = document.toJSON()
+        .body = document
     })
 }
 
