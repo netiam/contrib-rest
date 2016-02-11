@@ -33,7 +33,7 @@ describe('netiam', () => {
                 .create(profileFixture)
                 .then(profile => user.setProfile(profile))
                 .then(() => from({documents: user}))
-                .then(data => console.log(util.inspect(data, {depth: null})))
+                .then(data => util.inspect(data, {depth: null}))
             })
         })
         .then(() => done())

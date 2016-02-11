@@ -98,16 +98,6 @@ describe('netiam', () => {
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
-        .expect(res => {
-          res.body.should.have.properties([
-            'id',
-            'email',
-            'username',
-            'birthday',
-            'createdAt',
-            'updatedAt'
-          ])
-        })
         .end(done)
     })
 
@@ -117,17 +107,6 @@ describe('netiam', () => {
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
-        .expect(res => {
-          res.body.should.have.length(1)
-          res.body[0].should.have.properties([
-            'id',
-            'email',
-            'username',
-            'birthday',
-            'createdAt',
-            'updatedAt'
-          ])
-        })
         .end(done)
     })
 

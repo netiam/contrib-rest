@@ -1,7 +1,10 @@
 import request from 'supertest'
 import uuid from 'uuid'
+import util from 'util'
 import appMock from './utils/app'
+import projectFixture from './fixtures/project'
 import userFixture from './fixtures/user'
+import Project from './models/project'
 import User from './models/user'
 import {
   setup,
@@ -34,7 +37,6 @@ app.get('/users/:id', function(req, res) {
       res.json(res.body)
     })
     .catch(err => {
-      console.log(err)
       res
         .status(500)
         .json(err)
@@ -64,8 +66,12 @@ describe('netiam', () => {
             'createdAt',
             'updatedAt'
           ])
-          done()
+
+          return Project
+            .create(projectFixture)
+            .then(document => user.setProjects([document]))
         })
+        .then(() => done())
         .catch(done)
     })
 
@@ -76,21 +82,14 @@ describe('netiam', () => {
         .expect(200)
         .expect('Content-Type', /json/)
         .expect(res => {
-          res.body.should.be.an.Array()
-          res.body.should.have.length(1)
-          res.body[0].should.have.properties([
-            'id',
-            'email',
-            'username',
-            'birthday',
-            'createdAt',
-            'updatedAt'
-          ])
+          res.body.should.be.an.Object()
+          res.body.should.have.properties(['data'])
+          console.log(util.inspect(res.body, {depth: null}))
         })
         .end(done)
     })
 
-    it('should get a user by ID', done => {
+    it.skip('should get a user by ID', done => {
       request(app)
         .get(`/users/${user.id}`)
         .set('Accept', 'application/json')
