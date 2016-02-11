@@ -11,17 +11,16 @@ import {
   teardown
 } from '../utils/db'
 import {
-  from,
-  to
-} from '../../src/ds'
+  convert
+} from '../../src/jsonapi'
 
 describe('netiam', () => {
-  describe('DS - transform', () => {
+  describe('JSON API - convert', () => {
 
     before(setup)
     after(teardown)
 
-    it('creates a user and transforms into internal representation', done => {
+    it('creates a user and assigns a profile', done => {
       User
         .create(userFixture)
         .then(user => {
@@ -32,9 +31,21 @@ describe('netiam', () => {
               return Profile
                 .create(profileFixture)
                 .then(profile => user.setProfile(profile))
-                .then(() => from({documents: user}))
-                .then(data => util.inspect(data, {depth: null}))
             })
+        })
+        .then(() => done())
+        .catch(done)
+    })
+
+    it('queries all users including all associations', done => {
+      User
+        .findAll({include: [{all: true}]})
+        .then(users => {
+          const documents = users.map(user => user.toJSON())
+          const json = convert({
+            documents,
+            model: User
+          })
         })
         .then(() => done())
         .catch(done)

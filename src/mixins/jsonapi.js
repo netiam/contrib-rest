@@ -1,5 +1,5 @@
 const _ = require('lodash').runInContext()
-import {from} from '../ds'
+import {from} from '../jsonapi'
 import Instance from 'sequelize/lib/instance'
 
 const mixin = {

@@ -2,7 +2,7 @@ import {
   normalize,
   include
 } from '../params'
-import {from} from '../ds'
+import {convert} from '../jsonapi'
 import Promise from 'bluebird'
 
 function fetchAll({model, req, res}) {
@@ -17,11 +17,13 @@ function fetchAll({model, req, res}) {
         param: query.include
       })
     })
-    .then(documents => from({documents}))
     .then(documents => {
       res
         .status(200)
-        .body = documents
+        .body = convert({
+          documents,
+          model
+        })
     })
   const count = model
     .count()
@@ -43,11 +45,13 @@ function fetchOne({model, idParam, idField, req, res}) {
         param: query.include
       })
     })
-    .then(document => document.toJSONApi())
     .then(document => {
       res
         .status(200)
-        .body = document
+        .body = convert({
+          documents: document,
+          model
+        })
     })
 }
 
