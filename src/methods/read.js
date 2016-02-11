@@ -12,10 +12,11 @@ function fetchAll({model, req, res}) {
       order: query.order,
       limit: query.limit,
       offset: query.offset,
-      include: include({
+      include: [{ all: true }]
+      /*include: include({
         model,
         param: query.include
-      })
+      })*/
     })
     .then(documents => {
       res
@@ -40,10 +41,11 @@ function fetchOne({model, idParam, idField, req, res}) {
       where: {
         [idField]: req.params[idParam]
       },
-      include: include({
+      include: [{ all: true }]
+      /*include: include({
         model,
         param: query.include
-      })
+      })*/
     })
     .then(document => {
       res
