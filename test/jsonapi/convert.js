@@ -100,5 +100,57 @@ describe('netiam', () => {
         .catch(done)
     })
 
+    it('query a single user including all associations', done => {
+      User
+        .findOne({
+          where: {username: 'eliias'},
+          include: [{all: true}]
+        })
+        .then(user => {
+          const document = user.toJSON()
+          const json = convert({
+            documents: document,
+            model: User
+          })
+          json.should.have.properties(['data', 'included'])
+          json.data.should.be.Object()
+          json.data.should.be.Object()
+          json.data.should.have.properties([
+            'id',
+            'type',
+            'attributes',
+            'relationships'
+          ])
+          json.data.id.should.be.String()
+          json.data.id.should.have.length(36)
+          json.data.type.should.be.String()
+          json.data.type.should.eql('user')
+          json.data.attributes.should.be.Object()
+          json.data.attributes.should.have.properties([
+            'email',
+            'username',
+            'birthday',
+            'createdAt',
+            'updatedAt'
+          ])
+          json.data.attributes.email.should.eql('hannes@impossiblearts.com')
+          json.data.attributes.username.should.eql('eliias')
+          json.data.relationships.should.be.Object()
+          json.data.relationships.should.have.properties([
+            'campaigns',
+            'projects',
+            'profile'
+          ])
+          json.included.should.be.Array()
+          json.included.should.have.length(4)
+          json.included[0].type.should.eql('campaign')
+          json.included[1].type.should.eql('campaign')
+          json.included[2].type.should.eql('project')
+          json.included[3].type.should.eql('profile')
+        })
+        .then(() => done())
+        .catch(done)
+    })
+
   })
 })

@@ -1,16 +1,16 @@
 import request from 'supertest'
 import uuid from 'uuid'
 import util from 'util'
-import appMock from './utils/app'
-import projectFixture from './fixtures/project'
-import userFixture from './fixtures/user'
-import Project from './models/project'
-import User from './models/user'
+import appMock from '../utils/app'
+import projectFixture from '../fixtures/project'
+import userFixture from '../fixtures/user'
+import Project from '../models/project'
+import User from '../models/user'
 import {
   setup,
   teardown
-} from './utils/db'
-import rest from '../src/rest'
+} from '../utils/db'
+import rest from '../../src/rest'
 
 let user
 
