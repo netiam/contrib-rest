@@ -1,7 +1,8 @@
 import Sequelize from 'sequelize'
 import {db} from '../utils/db'
+import Project from './project'
 
-const Project = db.define('Project', {
+const Campaign = db.define('Campaign', {
   id: {
     type: Sequelize.UUID,
     primaryKey: true,
@@ -13,4 +14,6 @@ const Project = db.define('Project', {
   }
 })
 
-export default Project
+Campaign.belongsTo(Project, {as: 'project'})
+
+export default Campaign

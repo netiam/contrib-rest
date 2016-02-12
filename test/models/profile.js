@@ -6,7 +6,7 @@ const Project = db.define('Profile', {
     type: Sequelize.UUID,
     primaryKey: true,
     isUUID: 4,
-    defaultValue: Sequelize.UUIDV4()
+    defaultValue: Sequelize.UUIDV4
   }
 })
 

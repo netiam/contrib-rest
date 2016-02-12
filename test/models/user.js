@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize'
 import {db} from '../utils/db'
+import Campaign from './campaign'
 import Project from './project'
 import Profile from './profile'
 
@@ -8,7 +9,7 @@ const User = db.define('User', {
     type: Sequelize.UUID,
     primaryKey: true,
     isUUID: 4,
-    defaultValue: Sequelize.UUIDV4()
+    defaultValue: Sequelize.UUIDV4
   },
   email: {
     type: Sequelize.STRING,
@@ -21,13 +22,8 @@ const User = db.define('User', {
   birthday: Sequelize.DATE
 })
 
-User.hasMany(Project, {
-  as: 'projects',
-  foreignKey: 'owner'
-})
-User.hasOne(Profile, {
-  as: 'profile',
-  foreignkey: 'user'
-})
+User.hasMany(Campaign, {as: 'campaigns'})
+User.hasMany(Project, {as: 'projects'})
+User.hasOne(Profile, {as: 'profile'})
 
 export default User
