@@ -31,6 +31,11 @@ export default function resource({document, model, include, path, included}) {
     const data = document[key]
     const relationshipModel = model.associations[key].target
     const relationshipPath = path.length > 0 ? path + '.' + key : key
+    const isIncl = isIncluded({
+      relationshipPath,
+      include
+    })
+
     if (_.isArray(data)) {
       relationships[key] = {
         data: _.map(data, document => {
@@ -38,16 +43,13 @@ export default function resource({document, model, include, path, included}) {
             document,
             model: relationshipModel
           })
-          if (
-            isIncluded({
-              relationshipPath,
-              include
-            })) {
+          if (isIncl) {
             included[id] = resource({
               document,
               model: relationshipModel,
-              included,
-              path: relationshipPath
+              include,
+              path: relationshipPath,
+              included
             })
           }
           return resourceIdentifier({
@@ -61,15 +63,13 @@ export default function resource({document, model, include, path, included}) {
         document: data,
         model: relationshipModel
       })
-      if (isIncluded({
-          relationshipPath,
-          include
-        })) {
+      if (isIncl) {
         included[id] = resource({
           document: data,
           model: relationshipModel,
-          included,
-          path: relationshipPath
+          include,
+          path: relationshipPath,
+          included
         })
       }
       relationships[key] = {

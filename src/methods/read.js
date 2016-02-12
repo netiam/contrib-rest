@@ -1,3 +1,4 @@
+import util from 'util'
 import {
   normalize,
   include
@@ -11,6 +12,7 @@ function fetchAll({model, req, res}) {
     model,
     param: query.include
   }))
+
   const documents = model
     .findAll({
       order: query.order,

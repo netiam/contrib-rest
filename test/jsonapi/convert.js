@@ -1,10 +1,14 @@
 import Promise from 'bluebird'
 import util from 'util'
 import Campaign from '../models/campaign'
+import Component from '../models/component'
+import Node from '../models/node'
 import User from '../models/user'
 import Profile from '../models/profile'
 import Project from '../models/project'
 import campaignFixture from '../fixtures/campaign'
+import componentFixture from '../fixtures/component'
+import nodeFixture from '../fixtures/node'
 import userFixture from '../fixtures/user'
 import profileFixture from '../fixtures/profile'
 import projectFixture from '../fixtures/project'
@@ -16,6 +20,9 @@ import {
 import {
   convert
 } from '../../src/jsonapi'
+import {
+  include
+} from '../../src/params'
 
 describe('netiam', () => {
   describe('JSON API - convert', () => {
@@ -25,25 +32,36 @@ describe('netiam', () => {
 
     it('creates a user and assigns a profile', done => {
       const user = User.create(userFixture)
-      const project = Project.create(projectFixture)
-      const campaign1 = Campaign.create({name: 'campaign1'})
-      const campaign2 = Campaign.create({name: 'campaign2'})
       const profile = Profile.create(profileFixture)
+      const project = Project.create(projectFixture)
+      const campaigns = Campaign.bulkCreate([
+        {name: 'campaign1'},
+        {name: 'campaign2'}
+      ])
+      const nodes = Node.bulkCreate([nodeFixture, nodeFixture, nodeFixture])
+      const components = Component.bulkCreate([
+        nodeFixture,
+        nodeFixture,
+        nodeFixture,
+        nodeFixture
+      ])
 
       Promise
-        .all([user, project, campaign1, campaign2, profile])
+        .all([user, profile, project, campaigns, nodes, components])
         .then(documents => {
-          const [user, project, campaign1, campaign2, profile] = documents
+          const [user, profile, project, campaigns, nodes, components] = documents
           const userProfileAssoc = user.setProfile(profile)
           const userProjectAssoc = user.addProject(project)
-          const userCampaign1Assoc = user.addCampaign(campaign1)
-          const userCampaign2Assoc = user.addCampaign(campaign2)
+          const userCampaignAssoc = user.setCampaigns(campaigns)
+          const campaignNodeAssoc = campaigns.map(campaign => campaign.setNodes(nodes))
+          const nodeComponentAssoc = nodes.map(node => node.setComponents(components))
 
           return Promise.all([
             userProfileAssoc,
             userProjectAssoc,
-            userCampaign1Assoc,
-            userCampaign2Assoc
+            userCampaignAssoc,
+            campaignNodeAssoc,
+            nodeComponentAssoc
           ])
         })
         .then(() => done())
@@ -51,16 +69,24 @@ describe('netiam', () => {
     })
 
     it('queries all users including all associations', done => {
+      const includeParams = [
+        'projects',
+        'campaigns',
+        'profile'
+      ]
+      const inc = [{all: true}].concat(include({
+        model: User,
+        param: includeParams
+      }))
+
       User
-        .findAll({
-          include: [{all: true}]
-        })
+        .findAll({include: inc})
         .then(users => {
           const documents = users.map(user => user.toJSON())
           const json = convert({
             documents,
             model: User,
-            include: ['projects', 'campaigns', 'profile']
+            include: includeParams
           })
           json.should.have.properties(['data', 'included'])
           json.data.should.be.Array()

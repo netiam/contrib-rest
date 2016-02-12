@@ -77,7 +77,7 @@ export function include({model, param}) {
 
   return param.map(path => {
     const parts = path.split('.')
-
+    // TODO match all params with _.starsWith to avoid double path includes
     return includeObject({
       model,
       parts

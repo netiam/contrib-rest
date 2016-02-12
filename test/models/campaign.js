@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize'
 import {db} from '../utils/db'
+import Node from './node'
 import Project from './project'
 
 const Campaign = db.define('Campaign', {
@@ -14,6 +15,7 @@ const Campaign = db.define('Campaign', {
   }
 })
 
+Campaign.hasMany(Node, {as: 'nodes'})
 Campaign.belongsTo(Project, {as: 'project'})
 
 export default Campaign
