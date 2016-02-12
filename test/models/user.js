@@ -26,4 +26,6 @@ User.hasMany(Campaign, {as: 'campaigns'})
 User.hasMany(Project, {as: 'projects'})
 User.hasOne(Profile, {as: 'profile'})
 
+Project.belongsTo(User, {as: 'owner'})
+
 export default User

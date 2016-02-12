@@ -7,7 +7,7 @@ import getType from './jsonapi/type'
 export function to({data}) {
 }
 
-export function convert({documents, model}) {
+export function convert({documents, model, include, path = ''}) {
   const included = {}
 
   if (_.isArray(documents)) {
@@ -15,6 +15,8 @@ export function convert({documents, model}) {
         data: _.map(documents, document => resource({
           document,
           model,
+          include,
+          path,
           included
         })),
         included: _.values(included)
@@ -27,6 +29,8 @@ export function convert({documents, model}) {
       data: resource({
         document: documents,
         model,
+        include,
+        path,
         included
       }),
       included: _.values(included)

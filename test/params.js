@@ -22,8 +22,7 @@ describe('netiam', () => {
         model: User,
         param: []
       })
-
-      should(associations).eql(undefined)
+      should(associations).eql([])
     })
 
     it('should throw error because of invalid include param', () => {
@@ -38,7 +37,7 @@ describe('netiam', () => {
     it('should include a document', () => {
       const associations = include({
         model: User,
-        param: 'Project'.split(',')
+        param: 'projects'.split(',')
       })
 
       associations.should.have.length(1)
@@ -48,7 +47,7 @@ describe('netiam', () => {
     it('should include two documents', () => {
       const associations = include({
         model: User,
-        param: 'Project,User'.split(',')
+        param: 'projects,profile'.split(',')
       })
 
       associations.should.have.length(2)
@@ -59,13 +58,17 @@ describe('netiam', () => {
     it('should include a nested document', () => {
       const associations = include({
         model: User,
-        param: 'Project.User'.split(',')
+        param: 'projects.owner'.split(',')
       })
 
       associations.should.have.length(1)
       associations[0].should.have.properties(['model', 'include'])
       associations[0].include.should.have.length(1)
       associations[0].include[0].should.have.properties(['model'])
+    })
+
+    it.skip('should test invalid parameter combinations for include', () => {
+
     })
 
   })

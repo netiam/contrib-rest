@@ -20,9 +20,7 @@ const app = appMock()
 
 app.get('/users', function(req, res) {
   plugin(req, res)
-    .then(() => {
-      res.json(res.body)
-    })
+    .then(() => res.json(res.body))
     .catch(err => {
       console.log(err)
       res
@@ -33,10 +31,9 @@ app.get('/users', function(req, res) {
 
 app.get('/users/:id', function(req, res) {
   plugin(req, res)
-    .then(() => {
-      res.json(res.body)
-    })
+    .then(() => res.json(res.body))
     .catch(err => {
+      console.log(err)
       res
         .status(500)
         .json(err)
@@ -77,7 +74,7 @@ describe('netiam', () => {
 
     it('should get users', done => {
       request(app)
-        .get('/users')
+        .get('/users?include=projects.owner')
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -123,7 +120,7 @@ describe('netiam', () => {
 
     it('should get a user by ID', done => {
       request(app)
-        .get(`/users/${user.id}`)
+        .get(`/users/${user.id}?include=projects`)
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)

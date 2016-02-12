@@ -52,12 +52,15 @@ describe('netiam', () => {
 
     it('queries all users including all associations', done => {
       User
-        .findAll({include: [{all: true}]})
+        .findAll({
+          include: [{all: true}]
+        })
         .then(users => {
           const documents = users.map(user => user.toJSON())
           const json = convert({
             documents,
-            model: User
+            model: User,
+            include: ['projects', 'campaigns', 'profile']
           })
           json.should.have.properties(['data', 'included'])
           json.data.should.be.Array()
@@ -104,13 +107,16 @@ describe('netiam', () => {
       User
         .findOne({
           where: {username: 'eliias'},
-          include: [{all: true}]
+          include: [
+            {all: true},
+          ]
         })
         .then(user => {
           const document = user.toJSON()
           const json = convert({
             documents: document,
-            model: User
+            model: User,
+            include: ['projects', 'campaigns', 'profile']
           })
           json.should.have.properties(['data', 'included'])
           json.data.should.be.Object()

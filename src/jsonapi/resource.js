@@ -3,13 +3,18 @@ import getId from './id'
 import getType from './type'
 import resourceIdentifier from './resource-identifier'
 
-export default function resource({document, model, included}) {
+function isIncluded({relationshipPath, include}) {
+  return _.filter(include, param => {
+      return _.startsWith(param, relationshipPath)
+    }).length > 0
+}
+
+export default function resource({document, model, include, path, included}) {
   const id = getId({
     document,
     model
   })
   const type = getType({model})
-
   const foreignKeys = _.reject(
     _.map(model.attributes, (attribute, key) => {
       return _.has(attribute, 'references') ? key : undefined
@@ -25,6 +30,7 @@ export default function resource({document, model, included}) {
   _.forEach(relationshipKeys, key => {
     const data = document[key]
     const relationshipModel = model.associations[key].target
+    const relationshipPath = path.length > 0 ? path + '.' + key : key
     if (_.isArray(data)) {
       relationships[key] = {
         data: _.map(data, document => {
@@ -32,11 +38,18 @@ export default function resource({document, model, included}) {
             document,
             model: relationshipModel
           })
-          included[id] = resource({
-            document,
-            model: relationshipModel,
-            included
-          })
+          if (
+            isIncluded({
+              relationshipPath,
+              include
+            })) {
+            included[id] = resource({
+              document,
+              model: relationshipModel,
+              included,
+              path: relationshipPath
+            })
+          }
           return resourceIdentifier({
             document,
             model: relationshipModel
@@ -48,11 +61,17 @@ export default function resource({document, model, included}) {
         document: data,
         model: relationshipModel
       })
-      included[id] = resource({
-        document: data,
-        model: relationshipModel,
-        included
-      })
+      if (isIncluded({
+          relationshipPath,
+          include
+        })) {
+        included[id] = resource({
+          document: data,
+          model: relationshipModel,
+          included,
+          path: relationshipPath
+        })
+      }
       relationships[key] = {
         data: resourceIdentifier({
           document: data,
