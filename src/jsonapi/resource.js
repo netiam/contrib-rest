@@ -3,6 +3,9 @@ import getId from './id'
 import getType from './type'
 import resourceIdentifier from './resource-identifier'
 
+// TODO We do have to load complete information about relationships if they are included including there relationships (root -> association -> relationships)
+// TODO Refactor loading process in order to exactly know which resources must be loaded (include) and therefore fetch their resource too
+
 function isIncluded({relationshipPath, include}) {
   return _.filter(include, param => {
       return _.startsWith(param, relationshipPath)
