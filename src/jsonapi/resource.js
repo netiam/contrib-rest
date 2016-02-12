@@ -63,10 +63,18 @@ export default function resource({document, model, included}) {
     // Ignore "empty" relationships
   })
 
-  return {
+  const res = {
     id,
-    type,
-    attributes,
-    relationships
+    type
   }
+
+  if (!_.isEmpty(attributes)) {
+    res.attributes = attributes
+  }
+
+  if (!_.isEmpty(relationships)) {
+    res.relationships = relationships
+  }
+
+  return Object.freeze(res)
 }
