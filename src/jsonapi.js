@@ -63,7 +63,7 @@ function resource({document, model, included}) {
           })
         })
       }
-    } else {
+    } else if (_.isObject(data)) {
       const id = getId({
         document: data,
         model: relationshipModel
@@ -80,6 +80,7 @@ function resource({document, model, included}) {
         })
       }
     }
+    // Ignore "empty" relationships
   })
 
   return {
