@@ -1,17 +1,17 @@
 import _ from 'lodash'
-import base from './jsonapi/document'
-import resource from './jsonapi/resource'
-import getId from './jsonapi/id'
-import getType from './jsonapi/type'
+import document from './document'
+import resource from './resource'
 
 export function to({data}) {
+  // TODO just validate, we do expect a valid jsonapi ds here
+  return data
 }
 
 export function convert({documents, model, include, path = ''}) {
   const included = {}
 
   if (_.isArray(documents)) {
-    return base({
+    return document({
         data: _.map(documents, document => resource({
           document,
           model,
@@ -25,7 +25,7 @@ export function convert({documents, model, include, path = ''}) {
   }
 
   if (_.isObject(documents)) {
-    return base({
+    return document({
       data: resource({
         document: documents,
         model,

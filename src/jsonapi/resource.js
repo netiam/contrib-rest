@@ -1,6 +1,4 @@
 import _ from 'lodash'
-import getId from './id'
-import getType from './type'
 import resourceIdentifier from './resource-identifier'
 import adapter from '../adapters'
 

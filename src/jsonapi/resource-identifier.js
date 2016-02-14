@@ -1,12 +1,11 @@
-import getId from './id'
-import getType from './type'
+import adapter from '../adapters'
 
 export default function({document, model}) {
   return {
-    id: getId({
+    id: adapter.id({
       document,
       model
     }),
-    type: getType({model})
+    type: adapter.type({model})
   }
 }
