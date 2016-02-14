@@ -10,7 +10,7 @@
 
 ```js
 netiam()
-  .rest({Model: User})
+  .rest({model: User})
   .json()
 ```
 
