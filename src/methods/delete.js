@@ -5,13 +5,10 @@ export default function({model, idParam, idField, req, res}) {
         .findOne({
           where: {
             [idField]: req.params[idParam]
-          }
+          },
+          transaction
         })
-        .then(document => {
-          return document.destroy()
-        })
-        .then(() => {
-          res.status(204)
-        })
+        .then(document => document.destroy({transaction}))
+        .then(() => res.status(204))
     })
 }
