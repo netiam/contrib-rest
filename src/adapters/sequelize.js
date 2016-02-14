@@ -161,7 +161,7 @@ export function isIncluded({model, path, include}) {
     for (let i = 0; i < pathParts.length; i += 1) {
       if (includeParts[i] !== pathParts[i]) {
         match = false
-        break;
+        break
       }
     }
     if (match) {
