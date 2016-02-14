@@ -2,101 +2,92 @@ import _ from 'lodash'
 import getId from './id'
 import getType from './type'
 import resourceIdentifier from './resource-identifier'
+import adapter from '../adapters'
 
-// TODO We do have to load complete information about relationships if they are included including there relationships (root -> association -> relationships)
-// TODO Refactor loading process in order to exactly know which resources must be loaded (include) and therefore fetch their resource too
+// TODO 1.1 We do have to load complete information about relationships if they are included including there relationships (root -> association -> relationships)
+// TODO 1.2 Refactor loading process in order to exactly know which resources must be loaded (include) and therefore fetch their resource too
 
-function isIncluded({relationshipPath, include}) {
-  return _.filter(include, param => {
-      return _.startsWith(param, relationshipPath)
-    }).length > 0
+function compound({model, relationshipModel, relationshipPath, include, included, document}) {
+  const id = adapter.id({
+    model: relationshipModel,
+    document
+  })
+  if (adapter.isIncluded({
+      model,
+      path: relationshipPath,
+      include
+    }) && !_.has(included, id)) {
+    included[id] = resource({
+      model: relationshipModel,
+      document
+    })
+  }
+  return resourceIdentifier({
+    model: relationshipModel,
+    document
+  })
 }
 
 export default function resource({document, model, include, path, included}) {
-  const id = getId({
+  const id = adapter.id({
     document,
     model
   })
-  const type = getType({model})
-  const foreignKeys = _.reject(
-    _.map(model.attributes, (attribute, key) => {
-      return _.has(attribute, 'references') ? key : undefined
-    }),
-    _.isEmpty
-  )
-  const excludeKeys = _.keys(model.primaryKeys).concat(foreignKeys)
-  const attributeKeys = _.without(_.keys(model.attributes), ...excludeKeys)
-  const attributes = _.pick(document, attributeKeys)
-  const relationshipKeys = _.keys(model.associations)
-
-  const relationships = {}
-  _.forEach(relationshipKeys, key => {
-    const data = document[key]
-    const relationshipModel = model.associations[key].target
-    const relationshipPath = path.length > 0 ? path + '.' + key : key
-    const isIncl = isIncluded({
-      relationshipPath,
-      include
+  const type = adapter.type({model})
+  const attributes = adapter.attributes({
+    model,
+    document
+  })
+  const associations = adapter.relationships({
+    model,
+    document
+  })
+  const relationships = _.mapValues(associations, (data, relationship) => {
+    const relationshipPath = path.length > 0 ? path + '.' + relationship : relationship
+    const relationshipModel = adapter.relationshipModel({
+      model,
+      relationship
     })
 
     if (_.isArray(data)) {
-      relationships[key] = {
-        data: _.map(data, document => {
-          const id = getId({
-            document,
-            model: relationshipModel
-          })
-          if (isIncl) {
-            included[id] = resource({
-              document,
-              model: relationshipModel,
-              include,
-              path: relationshipPath,
-              included
-            })
-          }
-          return resourceIdentifier({
-            document,
-            model: relationshipModel
-          })
-        })
-      }
-    } else if (_.isObject(data)) {
-      const id = getId({
-        document: data,
-        model: relationshipModel
-      })
-      if (isIncl) {
-        included[id] = resource({
-          document: data,
-          model: relationshipModel,
+      return {
+        data: _.map(data, document => compound({
+          model,
+          relationshipModel,
+          relationshipPath,
           include,
-          path: relationshipPath,
-          included
-        })
+          included,
+          document,
+        }))
       }
-      relationships[key] = {
-        data: resourceIdentifier({
-          document: data,
-          model: relationshipModel
+    }
+
+    if (_.isObject(data)) {
+      return {
+        data: compound({
+          model,
+          relationshipModel,
+          relationshipPath,
+          include,
+          included,
+          document: data
         })
       }
     }
-    // Ignore "empty" relationships
   })
 
-  const res = {
+  const resourceObject = {
     id,
     type
   }
 
   if (!_.isEmpty(attributes)) {
-    res.attributes = attributes
+    resourceObject.attributes = attributes
   }
 
   if (!_.isEmpty(relationships)) {
-    res.relationships = relationships
+    resourceObject.relationships = relationships
   }
 
-  return Object.freeze(res)
+  return Object.freeze(resourceObject)
 }
