@@ -1,14 +1,16 @@
 import util from 'util'
 import {
-  normalize,
-  include
+  normalize
 } from '../params'
+import {
+  includeQuery
+} from '../adapters/sequelize'
 import {convert} from '../jsonapi'
 import Promise from 'bluebird'
 
 function fetchAll({model, req, res}) {
   const query = normalize({req})
-  const includeAttr = [{all: true}].concat(include({
+  const includeAttr = [{all: true}].concat(includeQuery({
     model,
     param: query.include
   }))
@@ -44,7 +46,7 @@ function fetchAll({model, req, res}) {
 
 function fetchOne({model, idParam, idField, req, res}) {
   const query = normalize({req})
-  const includeAttr = [{all: true}].concat(include({
+  const includeAttr = [{all: true}].concat(includeQuery({
     model,
     param: query.include
   }))

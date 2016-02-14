@@ -7,7 +7,7 @@ export function normalize({req, idField = 'id', limit = 10}) {
 
   const query = {
     filter: '',
-    include: [],
+    include: '',
     order: idField,
     limit: limit,
     offset: 0
@@ -19,8 +19,8 @@ export function normalize({req, idField = 'id', limit = 10}) {
   }
 
   // Embeded documents
-  if (_.isString(req.query.include)) {
-    query.include = req.query.include.split(',')
+  if (req.query.include) {
+    query.include = req.query.include
   }
 
   // Order
@@ -43,44 +43,4 @@ export function normalize({req, idField = 'id', limit = 10}) {
   }
 
   return Object.freeze(query)
-}
-
-function includeObject({model, parts, obj = {}}) {
-  const path = parts.shift()
-  // TODO check if path really exists
-  obj.model = model.associations[path].target
-  obj.as = path
-
-  if (parts.length === 0) {
-    return obj
-  }
-
-  const nestedObject = {}
-  obj.include = [nestedObject]
-
-  includeObject({
-    model: obj.model,
-    parts,
-    obj: nestedObject
-  })
-
-  return obj
-}
-
-export function include({model, param}) {
-  if (!_.isArray(param)) {
-    throw new Error(`The include parameter ${param} is not an array`)
-  }
-  if (param.length === 0) {
-    return []
-  }
-
-  return param.map(path => {
-    const parts = path.split('.')
-    // TODO match all params with _.starsWith to avoid double path includes
-    return includeObject({
-      model,
-      parts
-    })
-  })
 }

@@ -74,7 +74,7 @@ describe('netiam', () => {
 
     it('should get users', done => {
       request(app)
-        .get('/users?include=projects.owner')
+        .get('/users?include=projects')
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
@@ -120,7 +120,7 @@ describe('netiam', () => {
 
     it('should get a user by ID', done => {
       request(app)
-        .get(`/users/${user.id}?include=projects`)
+        .get(`/users/${user.id}?include=projects.owner`)
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', /json/)
