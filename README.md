@@ -16,8 +16,9 @@ netiam()
 
 ## Transactions
 
-The plugin does support transactions over Sequelize `cls` namespaces. It does
-not enforce transactions as you might use a database engine w/o transaction support.
+This plugin does support transactions via [`sequelize cls`](http://sequelize.readthedocs.org/en/latest/docs/transactions/#automatically-pass-transactions-to-all-queries) namespaces.
+However, it does not enforce transactions as you might use a database engine w/o
+any support for transactions.
 
 **How to**
 
