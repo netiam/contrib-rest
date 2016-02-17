@@ -14,6 +14,29 @@ netiam()
   .json()
 ```
 
+## Transactions
+
+The plugin does support transactions over Sequelize `cls` namespaces. It does
+not enforce transactions as you might use a database engine w/o transaction support.
+
+**How to**
+
+```js
+// test/utils/db.js
+import Sequelize from 'sequelize'
+import cls from 'continuation-local-storage'
+import uuid from 'uuid'
+
+const namespace = cls.createNamespace(uuid.v4())
+Sequelize.cls = namespace
+
+export const db = new Sequelize('netiam', 'netiam', 'netiam', {
+  dialect: 'sqlite',
+  storage: './test/db.sqlite',
+  logging: false
+})
+```
+
 ## License
 
 [MIT License](http://en.wikipedia.org/wiki/MIT_License)
