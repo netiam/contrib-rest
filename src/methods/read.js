@@ -14,7 +14,7 @@ function fetchAll({model, req, res}) {
     model,
     param: query.include
   }))
-
+  // TODO transaction to ensure COUNT matches response?
   const documents = model
     .findAll({
       order: query.order,
