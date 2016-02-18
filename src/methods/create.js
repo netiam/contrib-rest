@@ -1,27 +1,23 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
+import validate from '../validator'
+import schema from '../validator/schema/create.json'
 import {
   convert
 } from '../jsonapi'
 import adapter from '../adapters'
 
 export default function({model, req, res}) {
-  let body = req.body.data
-  if (_.isObject(body) && !_.isArray(body)) {
-    body = [body]
-  }
-  if (!_.isArray(body)) {
-    // TODO use netiam-errors error
+  if (!validate(schema, req.body)) {
     return Promise.reject(
-      new Error('Request body must either be an array of objects or a single object'))
+      new Error('Request body must be a valid JSON API object'))
   }
-  if (!body.every(_.isObject)) {
-    // TODO use netiam-errors error
-    return Promise.reject(
-      new Error('Request body must be an array of objects'))
+  let data = req.body.data
+  if (_.isObject(data) && !_.isArray(data)) {
+    data = [data]
   }
 
-  const attributes = _.map(body, document => document.attributes)
+  const attributes = _.map(data, document => document.attributes)
 
   return model.sequelize
     .transaction(transaction => {
@@ -32,7 +28,7 @@ export default function({model, req, res}) {
           return Promise
             .all(
               _.map(documents, (document, index) => {
-                const post = body[index]
+                const post = data[index]
                 if (!_.has(post, 'relationships')) {
                   return Promise.resolve()
                 }
