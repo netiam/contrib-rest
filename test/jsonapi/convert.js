@@ -142,7 +142,6 @@ describe('netiam', () => {
           })
           json.should.have.properties(['data', 'included'])
           json.data.should.be.Object()
-          json.data.should.be.Object()
           json.data.should.have.properties([
             'id',
             'type',
