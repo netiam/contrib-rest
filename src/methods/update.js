@@ -15,8 +15,7 @@ export default function({model, idField, idParam, req, res}) {
           where: {
             [idField]: req.params[idParam]
           },
-          defaults: req.body,
-          transaction
+          defaults: req.body
         })
         .spread((document, created) => {
           if (created) {
@@ -25,7 +24,7 @@ export default function({model, idField, idParam, req, res}) {
               .body = document.toJSON()
           }
 
-          return document.update(req.body, {transaction})
+          return document.update(req.body)
         })
     })
     .then(document => {
