@@ -1,8 +1,9 @@
 import _ from 'lodash'
+import Promise from 'bluebird'
 
-const ID_SEPARATOR = '-'
-const PATH_SEPARATOR = '.'
-const VALUE_SEPARATOR = ','
+export const ID_SEPARATOR = '--'
+export const PATH_SEPARATOR = '.'
+export const VALUE_SEPARATOR = ','
 
 export function idQuery({model, id}) {
   const fields = primaryKeys({model})
@@ -144,7 +145,7 @@ export function includeQuery({model, param}) {
   }))
 }
 
-export function isIncluded({model, path, include}) {
+export function isIncluded({model, path, include = ''}) {
   const params = _.filter(include.split(VALUE_SEPARATOR), value => {
     return validateIncludePath({
       model,
@@ -171,4 +172,34 @@ export function isIncluded({model, path, include}) {
   })
 
   return result
+}
+
+export function setRelationship({model, document, path, resourceIdentifiers, transaction}) {
+  if (!_.isArray(resourceIdentifiers)) {
+    resourceIdentifiers = [resourceIdentifiers]
+  }
+
+  const assocModel = relationshipModel({
+    model,
+    relationship: path
+  })
+
+  // TODO support composite primary keys
+  const ids = _.map(resourceIdentifiers, resourceIdentifier => resourceIdentifier.id)
+  const associationType = model.associations[path].associationType
+  return assocModel
+    .findAll({
+      where: {id: {$in: ids}},
+      transaction
+    })
+    .then(relatedDocuments => {
+      switch (associationType) {
+        case 'HasOne':
+          return document[`set${_.capitalize(path)}`](relatedDocuments.shift(), {transaction})
+        case 'HasMany':
+          return document[`set${_.capitalize(path)}`](relatedDocuments, {transaction})
+        default:
+          console.warn('Associations different than "HasOne" and "HasMany" are not supported')
+      }
+    })
 }

@@ -1,4 +1,8 @@
 import {
+  ID_SEPARATOR,
+  PATH_SEPARATOR,
+  VALUE_SEPARATOR,
+
   idQuery,
   includeQuery,
   isIncluded,
@@ -9,11 +13,16 @@ import {
   relationships,
 
   relationshipModel,
+  setRelationship,
 
   validateIncludePath
 } from './sequelize'
 
 export default Object.freeze({
+  ID_SEPARATOR,
+  PATH_SEPARATOR,
+  VALUE_SEPARATOR,
+
   idQuery,
   includeQuery,
   isIncluded,
@@ -24,6 +33,7 @@ export default Object.freeze({
   relationships,
 
   relationshipModel,
+  setRelationship,
 
   validateIncludePath
 })
