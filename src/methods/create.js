@@ -20,7 +20,7 @@ export default function({model, req, res}) {
   const attributes = _.map(data, document => document.attributes)
 
   return model.sequelize
-    .transaction(transaction => {
+    .transaction(() => {
       return model
         .bulkCreate(attributes)
         // FIXME: workaround for http://docs.sequelizejs.com/en/latest/api/model/#bulkcreaterecords-options-promisearrayinstance
