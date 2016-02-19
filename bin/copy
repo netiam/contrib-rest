@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# author: Hannes Moser <hannes@impossiblearts.com>
+#
+
+# copy schema files
+cp -R ./src/validator/schema ./lib/validator/

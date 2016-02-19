@@ -5,6 +5,7 @@
   "scripts": {
     "build": "./bin/build",
     "clean": "./bin/clean",
+    "copy": "./bin/copy",
     "lint": "./bin/lint",
     "start": "npm run watch",
     "test": "npm run test:unit",

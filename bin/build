@@ -7,4 +7,5 @@ npm run clean &&
 npm run lint &&
 babel --optional runtime \
       -e 1 \
-      -d ./lib ./src
+      -d ./lib ./src &&
+npm run copy
