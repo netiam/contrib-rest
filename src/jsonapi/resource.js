@@ -18,8 +18,8 @@ function compound({model, relationshipModel, relationshipPath, include, included
     included[id] = resource({
       document,
       model: relationshipModel,
-      include,
-      path: relationshipPath,
+      // FIXME workaround to get the next sibling in include path
+      include: include.split('.').slice(1).join('.'),
       included
     })
   }
