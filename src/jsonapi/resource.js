@@ -16,8 +16,11 @@ function compound({model, relationshipModel, relationshipPath, include, included
       include
     }) && !_.has(included, id)) {
     included[id] = resource({
+      document,
       model: relationshipModel,
-      document
+      include,
+      path: relationshipPath,
+      included
     })
   }
   return resourceIdentifier({
@@ -41,7 +44,7 @@ export default function resource({document, model, include, path, included}) {
     document
   })
   const relationships = _.mapValues(associations, (data, relationship) => {
-    const relationshipPath = path.length > 0 ? path + '.' + relationship : relationship
+    const relationshipPath = _.isString(path) && path.length > 0 ? path + '.' + relationship : relationship
     const relationshipModel = adapter.relationshipModel({
       model,
       relationship
