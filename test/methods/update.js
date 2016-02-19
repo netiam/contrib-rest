@@ -2,6 +2,7 @@ import request from 'supertest'
 import uuid from 'uuid'
 import appMock from '../utils/app'
 import userFixture from '../fixtures/user'
+import userUpdateFixture from '../fixtures/user-update.jsonapi'
 import User from '../models/user'
 import {
   setup,
@@ -36,13 +37,8 @@ describe('netiam', () => {
 
     it('should create a user', done => {
       User
-        .create({
-          username: 'eliias',
-          email: 'hannes@impossiblearts.com',
-          birthday: new Date(2015, 7, 3)
-        })
-        .then(document => {
-          user = document
+        .create(userFixture)
+        .then(user => {
           user.get({plain: true}).should.have.properties([
             'id',
             'email',
@@ -56,55 +52,45 @@ describe('netiam', () => {
         .catch(done)
     })
 
-    it('should create a user w/ ID', done => {
-      const modifiedUser = Object.assign({}, userFixture, {
-        id: uuid.v4(),
-        username: 'uuid',
-        email: 'uuid@neti.am'
-      })
-      request(app)
-        .put(`/users/${modifiedUser.id}`)
-        .send(modifiedUser)
-        .set('Accept', 'application/json')
-        .expect(200)
-        .expect('Content-Type', /json/)
-        .expect(res => {
-          res.body.should.have.properties([
-            'id',
-            'email',
-            'username',
-            'birthday',
-            'createdAt',
-            'updatedAt'
-          ])
-          res.body.username.should.eql('uuid')
-          res.body.email.should.eql('uuid@neti.am')
-        })
-        .end(done)
-    })
-
     it('should update a user', done => {
-      const user = Object.assign({}, userFixture, {
-        username: 'user1',
-        email: 'test1@neti.am'
-      })
       request(app)
-        .put(`/users/${user.id}`)
-        .send(user)
-        .set('Accept', 'application/json')
+        .put(`/users/${userUpdateFixture.data.id}`)
+        .send(JSON.stringify(userUpdateFixture))
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
         .expect(200)
         .expect('Content-Type', /json/)
         .expect(res => {
-          res.body.should.have.properties([
+          const json = res.body
+
+          json.should.have.properties(['data', 'included'])
+          json.data.should.be.Object()
+          json.data.should.be.Object()
+          json.data.should.have.properties([
             'id',
+            'type',
+            'attributes',
+            'relationships'
+          ])
+          json.data.id.should.be.String()
+          json.data.id.should.have.length(36)
+          json.data.type.should.be.String()
+          json.data.type.should.eql('user')
+          json.data.attributes.should.be.Object()
+          json.data.attributes.should.have.properties([
             'email',
             'username',
             'birthday',
             'createdAt',
             'updatedAt'
           ])
-          res.body.username.should.eql('user1')
-          res.body.email.should.eql('test1@neti.am')
+          json.data.attributes.email.should.eql('hannes@impossiblearts.com')
+          json.data.attributes.username.should.eql('hello new username')
+          json.data.relationships.should.be.Object()
+          json.data.relationships.should.have.properties([
+            'campaigns',
+            'projects'
+          ])
         })
         .end(done)
     })

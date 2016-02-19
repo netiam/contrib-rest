@@ -27,14 +27,6 @@
           "$ref": "#/definitions/resource"
         },
         {
-          "description": "An array of resource objects, an array of resource identifier objects, or an empty array ([]), for requests that target resource collections.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/resource"
-          },
-          "uniqueItems": true
-        },
-        {
           "description": "null if the request is one that might correspond to a single resource, but doesn't currently.",
           "type": "null"
         }
