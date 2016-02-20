@@ -112,6 +112,12 @@ describe('netiam', () => {
       })
     })
 
+    it('should filter falsy include values', () => {
+      include(User, 'foo').should.be.Array().of.length(0)
+      include(User, 'foo,').should.be.Array().of.length(0)
+      include(User, 'foo,.bar').should.be.Array().of.length(0)
+    })
+
     it('should create include query for param', () => {
       const query = include(User, [
         'profile',

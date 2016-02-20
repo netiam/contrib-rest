@@ -70,15 +70,16 @@ export function relationships(model, document) {
 }
 
 export function hasAssociation(model, path) {
-  const parts = path.split(PATH_SEPARATOR)
-  let result = true
-  let part
-
   if (path.length === 0) {
     return false
   }
 
-  while (part = parts.shift()) {
+  const parts = path.split(PATH_SEPARATOR)
+  let result = true
+  let part
+
+  while (parts.length > 0) {
+    part = parts.shift()
     const target = `associations.${part}.target`
     if (!_.has(model, target)) {
       result = false
@@ -86,7 +87,6 @@ export function hasAssociation(model, path) {
     }
     model = _.get(model, target)
   }
-
   return result
 }
 
