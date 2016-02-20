@@ -6,10 +6,16 @@
 
 > A REST plugin for netiam
 
+## Get it
+
+```
+npm i -S netiam netiam-contrib-rest
+```
+
 ## Example
 
 ```js
-netiam()
+netiam({plugins})
   .rest({model: User})
   .json()
 ```
