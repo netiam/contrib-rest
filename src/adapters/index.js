@@ -4,18 +4,20 @@ import {
   VALUE_SEPARATOR,
 
   idQuery,
-  includeQuery,
-  isIncluded,
 
-  idValue,
+  id,
   type,
   attributes,
   relationships,
 
-  relationshipModel,
-  setRelationship,
+  hasAssociation,
+  getAssociationModel,
 
-  validateIncludePath
+  isIncluded,
+  includePath,
+  include,
+
+  setRelationship
 } from './sequelize'
 
 export default Object.freeze({
@@ -24,16 +26,18 @@ export default Object.freeze({
   VALUE_SEPARATOR,
 
   idQuery,
-  includeQuery,
-  isIncluded,
 
-  id: idValue,
+  id,
   type,
   attributes,
   relationships,
 
-  relationshipModel,
-  setRelationship,
+  hasAssociation,
+  getAssociationModel,
 
-  validateIncludePath
+  isIncluded,
+  includePath,
+  include,
+
+  setRelationship
 })

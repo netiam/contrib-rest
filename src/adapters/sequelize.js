@@ -1,12 +1,13 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
+import util from 'util'
 
 export const ID_SEPARATOR = '--'
 export const PATH_SEPARATOR = '.'
 export const VALUE_SEPARATOR = ','
 
-export function idQuery({model, id}) {
-  const fields = primaryKeys({model})
+export function idQuery(model, id) {
+  const fields = primaryKeys(model)
   const values = id.split(ID_SEPARATOR)
 
   if (fields.length !== values.length) {
@@ -16,21 +17,21 @@ export function idQuery({model, id}) {
   return _.zipObject(fields, values)
 }
 
-function primaryKeys({model}) {
+function primaryKeys(model) {
   return _.keys(model.primaryKeys)
 }
 
-export function idValue({model, document}) {
-  const fields = primaryKeys({model})
+export function id(model, document) {
+  const fields = primaryKeys(model)
   const values = _.map(fields, field => document[field])
   return values.join(ID_SEPARATOR)
 }
 
-export function type({model}) {
+export function type(model) {
   return _.kebabCase(model.name)
 }
 
-function foreignKeys({model}) {
+function foreignKeys(model) {
   return _.reject(
     _.map(model.attributes, (attribute, key) => {
       return _.has(attribute, 'references') ? key : undefined
@@ -39,33 +40,25 @@ function foreignKeys({model}) {
   )
 }
 
-function attributeKeys({model}) {
-  const foreign = foreignKeys({model})
-  const primary = primaryKeys({model})
+function attributeKeys(model) {
+  const foreign = foreignKeys(model)
+  const primary = primaryKeys(model)
   const excludeKeys = primary.concat(foreign)
   return _.without(_.keys(model.attributes), ...excludeKeys)
 }
 
-export function attributes({model, document}) {
-  const keys = attributeKeys({model})
+export function attributes(model, document) {
+  const keys = attributeKeys(model)
   return _.pick(document, keys)
 }
 
-function relationshipKeys({model}) {
+function relationshipKeys(model) {
   return _.keys(model.associations)
 }
 
-export function relationshipModel({model, relationship}) {
-  if (!_.has(model.associations, relationship)) {
-    return
-  }
-
-  return model.associations[relationship].target
-}
-
-export function relationships({model, document}) {
+export function relationships(model, document) {
   const relationships = {}
-  const keys = relationshipKeys({model})
+  const keys = relationshipKeys(model)
   _.forEach(keys, key => {
     if (!document[key]) {
       return
@@ -76,81 +69,39 @@ export function relationships({model, document}) {
   return relationships
 }
 
-export function validateIncludePath({model, path}) {
+export function hasAssociation(model, path) {
   const parts = path.split(PATH_SEPARATOR)
-  if (parts.length === 0) {
-    return false
-  }
-  const keys = relationshipKeys({model})
-  if (parts.length === 1) {
-    return _.includes(keys, (parts[0]))
-  }
-
-  const relationship = parts.shift()
-  const assocModel = relationshipModel({
-    model,
-    relationship
-  })
-  if (!assocModel) {
-    return false
-  }
-
-  return validateIncludePath({
-    model: assocModel,
-    path: parts.join('.')
-  })
-}
-
-function include({model, path}) {
-  const parts = path.split(PATH_SEPARATOR)
-  const part = parts.shift()
-
-  const assocModel = relationshipModel({
-    model,
-    relationship: part
-  })
-
-  if (parts.length === 0) {
-    return {
-      model: assocModel,
-      as: part
+  let result = true
+  let part
+  while (part = parts.shift()) {
+    const target = `associations.${part}.target`
+    if (!_.has(model, target)) {
+      result = false
+      break;
     }
+    model = _.get(model, target)
   }
 
-  return {
-    model: assocModel,
-    as: part,
-    include: include({
-      model: assocModel,
-      path: parts.join(PATH_SEPARATOR)
-    })
-  }
+  return result
 }
 
-export function includeQuery({model, param}) {
-  const params = _.filter(param.split(VALUE_SEPARATOR), value => {
-    return validateIncludePath({
-      model,
-      path: value
-    })
-  })
-
-  if (params.length === 0) {
-    return []
+export function getAssociationModel(model, path) {
+  const parts = path.split(PATH_SEPARATOR)
+  let part
+  while (part = parts.shift()) {
+    const target = `associations.${part}.target`
+    if (!_.has(model, target)) {
+      throw new Error('Association does not exist')
+    }
+    model = _.get(model, target)
   }
 
-  return _.map(params, path => include({
-    model,
-    path
-  }))
+  return model
 }
 
-export function isIncluded({model, path, include = ''}) {
+export function isIncluded(model, path, include) {
   const params = _.filter(include.split(VALUE_SEPARATOR), value => {
-    return validateIncludePath({
-      model,
-      path: value
-    })
+    return hasAssociation(model, value)
   })
 
   let result = false
@@ -174,25 +125,73 @@ export function isIncluded({model, path, include = ''}) {
   return result
 }
 
+export function includePath(model, path) {
+  const parts = path.split(PATH_SEPARATOR)
+  const part = parts.shift()
+
+  const associationModel = getAssociationModel(model, part)
+
+  if (parts.length === 0) {
+    return {
+      model: associationModel,
+      as: part
+    }
+  }
+
+  return {
+    model: associationModel,
+    as: part,
+    include: [includePath(associationModel, parts.join(PATH_SEPARATOR))]
+  }
+}
+
+function merge(paths, include) {
+  return paths.reduce((include, path) => {
+    const exists = include.find(element => element.model === path.model && element.as === path.as)
+    if (!exists) {
+      include.push(path)
+      return include
+    }
+
+    if (!_.isArray(exists.include)) {
+      exists.include = []
+    }
+    if (_.isArray(path.include)) {
+      exists.include.push(...path.include)
+    }
+
+    exists.include = merge(exists.include, [])
+
+    return include
+  }, include)
+}
+
+export function include(model, include) {
+  if (!_.isString(include)) {
+    throw new Error('"include" must be string')
+  }
+  include = include.split(VALUE_SEPARATOR)
+  const paths = include.map(path => includePath(model, path))
+  return merge(paths, [])
+}
+
 export function setRelationship({model, document, path, resourceIdentifiers, transaction}) {
   if (!_.isArray(resourceIdentifiers)) {
     resourceIdentifiers = [resourceIdentifiers]
   }
 
-  const assocModel = relationshipModel({
-    model,
-    relationship: path
-  })
+  const associationModel = getAssociationModel(model, path)
 
   // TODO support composite primary keys
   const ids = _.map(resourceIdentifiers, resourceIdentifier => resourceIdentifier.id)
   const associationType = model.associations[path].associationType
-  return assocModel
+  return associationModel
     .findAll({
       where: {id: {$in: ids}},
       transaction
     })
     .then(relatedDocuments => {
+      // TODO sequelize docs say we should be able todo sth like this document.set('projects', documents)
       switch (associationType) {
         case 'HasOne':
           return document[`set${_.capitalize(path)}`](relatedDocuments.shift(), {transaction})

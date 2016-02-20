@@ -7,18 +7,12 @@ export function to({data}) {
   return data
 }
 
-export function convert({documents, model, include, path = ''}) {
+export function convert({documents, model, include = ''}) {
   const included = {}
 
   if (_.isArray(documents)) {
     return document({
-        data: _.map(documents, document => resource({
-          document,
-          model,
-          include,
-          path,
-          included
-        })),
+        data: _.map(documents, document => resource(model, model, document, include, included, '')),
         included: _.values(included)
       }
     )
@@ -26,13 +20,7 @@ export function convert({documents, model, include, path = ''}) {
 
   if (_.isObject(documents)) {
     return document({
-      data: resource({
-        document: documents,
-        model,
-        include,
-        path,
-        included
-      }),
+      data: resource(model, model, documents, include, included, ''),
       included: _.values(included)
     })
   }

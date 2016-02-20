@@ -21,7 +21,7 @@ import {
   convert
 } from '../../src/jsonapi'
 import {
-  includeQuery
+  include
 } from '../../src/adapters/sequelize'
 
 describe('netiam', () => {
@@ -70,13 +70,10 @@ describe('netiam', () => {
 
     it('queries all users including all associations', done => {
       const includeParam = 'projects,campaigns,profile'
-      const include = [{all: true}].concat(includeQuery({
-        model: User,
-        param: includeParam
-      }))
+      const inc = [{all: true}].concat(include(User, includeParam))
 
       User
-        .findAll({include})
+        .findAll({include: inc})
         .then(users => {
           const documents = users.map(user => user.toJSON())
           const json = convert({
@@ -84,6 +81,7 @@ describe('netiam', () => {
             model: User,
             include: includeParam
           })
+
           json.should.have.properties(['data', 'included'])
           json.data.should.be.Array()
           json.data.should.have.length(1)
@@ -130,7 +128,7 @@ describe('netiam', () => {
         .findOne({
           where: {username: 'eliias'},
           include: [
-            {all: true},
+            {all: true}
           ]
         })
         .then(user => {
@@ -140,6 +138,7 @@ describe('netiam', () => {
             model: User,
             include: 'projects,campaigns,profile'
           })
+
           json.should.have.properties(['data', 'included'])
           json.data.should.be.Object()
           json.data.should.have.properties([

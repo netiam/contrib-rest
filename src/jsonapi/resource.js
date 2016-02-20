@@ -2,77 +2,32 @@ import _ from 'lodash'
 import resourceIdentifier from './resource-identifier'
 import adapter from '../adapters'
 
-// TODO 1.1 We do have to load complete information about relationships if they are included including there relationships (root -> association -> relationships)
-// TODO 1.2 Refactor loading process in order to exactly know which resources must be loaded (include) and therefore fetch their resource too
-
-function compound({model, relationshipModel, relationshipPath, include, included, document}) {
-  const id = adapter.id({
-    model: relationshipModel,
-    document
-  })
-  if (adapter.isIncluded({
-      model,
-      path: relationshipPath,
-      include
-    }) && !_.has(included, id)) {
-    included[id] = resource({
-      document,
-      model: relationshipModel,
-      // FIXME workaround to get the next sibling in include path
-      include: include.split('.').slice(1).join('.'),
-      included
-    })
+function compound(baseModel, model, document, include, included, path) {
+  const id = adapter.id(model, document)
+  const isIncluded = adapter.isIncluded(baseModel, path, include)
+  if (isIncluded && !_.has(included, id)) {
+    included[id] = resource(baseModel, model, document, include, included, path)
   }
-  return resourceIdentifier({
-    model: relationshipModel,
-    document
-  })
+  return resourceIdentifier(model, document)
 }
 
-export default function resource({document, model, include, path, included}) {
-  const id = adapter.id({
-    document,
-    model
-  })
-  const type = adapter.type({model})
-  const attributes = adapter.attributes({
-    model,
-    document
-  })
-  const associations = adapter.relationships({
-    model,
-    document
-  })
+export default function resource(baseModel, model, document, include, included, path = '') {
+  const id = adapter.id(model, document)
+  const type = adapter.type(model)
+  const attributes = adapter.attributes(model, document)
+  const associations = adapter.relationships(model, document)
   const relationships = _.mapValues(associations, (data, relationship) => {
-    const relationshipPath = _.isString(path) && path.length > 0 ? path + '.' + relationship : relationship
-    const relationshipModel = adapter.relationshipModel({
-      model,
-      relationship
-    })
-
+    const relationshipModel = adapter.getAssociationModel(model, relationship)
+    const relationshipPath = path.length > 0 ? path + '.' + relationship : relationship
     if (_.isArray(data)) {
       return {
-        data: _.map(data, document => compound({
-          model,
-          relationshipModel,
-          relationshipPath,
-          include,
-          included,
-          document,
-        }))
+        data: _.map(data, document => compound(baseModel, relationshipModel, document, include, included, relationshipPath))
       }
     }
 
     if (_.isObject(data)) {
       return {
-        data: compound({
-          model,
-          relationshipModel,
-          relationshipPath,
-          include,
-          included,
-          document: data
-        })
+        data: compound(baseModel, relationshipModel, data, include, included, relationshipPath)
       }
     }
   })

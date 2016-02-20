@@ -1,11 +1,8 @@
 import adapter from '../adapters'
 
-export default function({document, model}) {
+export default function(model, document) {
   return {
-    id: adapter.id({
-      document,
-      model
-    }),
-    type: adapter.type({model})
+    id: adapter.id(model, document),
+    type: adapter.type(model)
   }
 }

@@ -3,17 +3,14 @@ import {
   normalize
 } from '../params'
 import {
-  includeQuery
+  include
 } from '../adapters/sequelize'
 import {convert} from '../jsonapi'
 import Promise from 'bluebird'
 
 function fetchAll({model, req, res}) {
   const query = normalize({req})
-  const includeAttr = [{all: true}].concat(includeQuery({
-    model,
-    param: query.include
-  }))
+  const includeAttr = [{all: true}].concat(include(model, query.include))
   // TODO transaction to ensure COUNT matches response?
   const documents = model
     .findAll({
@@ -32,8 +29,7 @@ function fetchAll({model, req, res}) {
       res.body = convert({
         documents,
         model,
-        include: query.include,
-        path: undefined
+        include: query.include
       })
     })
   const count = model
@@ -46,10 +42,8 @@ function fetchAll({model, req, res}) {
 
 function fetchOne({model, idParam, idField, req, res}) {
   const query = normalize({req})
-  const includeAttr = [{all: true}].concat(includeQuery({
-    model,
-    param: query.include
-  }))
+  const includeAttr = [{all: true}].concat(include(model, query.include))
+
   // TODO map idField to primaryKeys
   return model
     .findOne({
@@ -69,8 +63,7 @@ function fetchOne({model, idParam, idField, req, res}) {
       res.body = convert({
         documents: document,
         model,
-        include: query.include,
-        path: undefined
+        include: query.include
       })
     })
 }
