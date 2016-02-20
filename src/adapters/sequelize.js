@@ -77,7 +77,7 @@ export function hasAssociation(model, path) {
     const target = `associations.${part}.target`
     if (!_.has(model, target)) {
       result = false
-      break;
+      break
     }
     model = _.get(model, target)
   }
