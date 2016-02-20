@@ -14,6 +14,27 @@ netiam()
   .json()
 ```
 
+## Compound Documents
+
+To reduce the number of HTTP requests, you can *embed* related documents within
+the response object. You can do so, by utilizing the `include` parameter.
+
+```
+GET /articles?include=comments
+```
+
+Youc an also include more than one document at the same time.
+
+```
+GET /articles?include=comments,links
+```
+
+There is also support for deeply nested documents and documents on the same branch.
+
+```
+GET /articles?include=comments.author.profile,comments.author.image
+```
+
 ## Transactions
 
 This plugin does support transactions via [`sequelize cls`](http://sequelize.readthedocs.org/en/latest/docs/transactions/#automatically-pass-transactions-to-all-queries) namespaces.
