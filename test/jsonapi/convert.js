@@ -68,6 +68,57 @@ describe('netiam', () => {
         .catch(done)
     })
 
+    it('queries all users including no associations', done => {
+      const includeParam = ''
+      const inc = [{all: true}].concat(include(User, includeParam))
+
+      User
+        .findAll({include: inc})
+        .then(users => {
+          const documents = users.map(user => user.toJSON())
+          const json = convert({
+            documents,
+            model: User,
+            include: includeParam
+          })
+
+          json.should.have.properties(['data', 'included'])
+          json.data.should.be.Array()
+          json.data.should.have.length(1)
+          json.data[0].should.be.Object()
+          json.data[0].should.have.properties([
+            'id',
+            'type',
+            'attributes',
+            'relationships'
+          ])
+          json.data[0].id.should.be.String()
+          json.data[0].id.should.have.length(36)
+          json.data[0].type.should.be.String()
+          json.data[0].type.should.eql('user')
+          json.data[0].attributes.should.be.Object()
+          json.data[0].attributes.should.have.properties([
+            'email',
+            'username',
+            'birthday',
+            'createdAt',
+            'updatedAt'
+          ])
+          json.data[0].attributes.email.should.eql('hannes@impossiblearts.com')
+          json.data[0].attributes.username.should.eql('eliias')
+          json.data[0].relationships.should.be.Object()
+          json.data[0].relationships.should.have.properties([
+            'campaigns',
+            'projects',
+            'profile'
+          ])
+          json.included.should.be.Array()
+          json.included.should.have.length(0)
+        })
+        .then(() => done())
+        .catch(done)
+    })
+
     it('queries all users including all associations', done => {
       const includeParam = 'projects,campaigns,profile'
       const inc = [{all: true}].concat(include(User, includeParam))

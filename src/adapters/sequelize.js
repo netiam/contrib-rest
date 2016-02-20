@@ -73,6 +73,11 @@ export function hasAssociation(model, path) {
   const parts = path.split(PATH_SEPARATOR)
   let result = true
   let part
+
+  if (path.length === 0) {
+    return false
+  }
+
   while (part = parts.shift()) {
     const target = `associations.${part}.target`
     if (!_.has(model, target)) {
@@ -170,7 +175,11 @@ export function include(model, include) {
   if (!_.isString(include)) {
     throw new Error('"include" must be string')
   }
-  include = include.split(VALUE_SEPARATOR)
+
+  include = _.filter(include.split(VALUE_SEPARATOR), value => {
+    return hasAssociation(model, value)
+  })
+
   const paths = include.map(path => includePath(model, path))
   return merge(paths, [])
 }
