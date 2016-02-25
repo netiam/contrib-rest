@@ -22,7 +22,7 @@ export default function({model, idField, idParam, req, res}) {
         .then(document => {
           res.status(200)
           res.body = convert({
-            documents: document,
+            documents: document.toJSON(),
             model
           })
         })

@@ -52,7 +52,8 @@ export default function({model, req, res}) {
               })
             })
             .then(documents => {
-              // FIXME: /resources n.e. /resources/:id but /resources still can have just a single document
+              documents = _.map(documents, document => document.toJSON())
+
               if (documents.length === 1) {
                 documents = documents.shift()
               }

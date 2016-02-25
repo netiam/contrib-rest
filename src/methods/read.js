@@ -1,4 +1,4 @@
-import util from 'util'
+import _ from 'lodash'
 import {
   normalize
 } from '../params'
@@ -27,7 +27,7 @@ function fetchAll({model, req, res}) {
       }
       res.status(200)
       res.body = convert({
-        documents,
+        documents: _.map(documents, document => document.toJSON()),
         model,
         include: query.include
       })
@@ -61,7 +61,7 @@ function fetchOne({model, idParam, idField, req, res}) {
       }
       res.status(200)
       res.body = convert({
-        documents: document,
+        documents: document.toJSON(),
         model,
         include: query.include
       })
