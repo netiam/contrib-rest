@@ -83,15 +83,11 @@ describe('netiam', () => {
       struct.should.be.Array()
       struct.should.have.length(2)
 
-      struct[0].should.be.Object()
-      struct[0].should.have.properties(['field', 'order'])
-      struct[0].should.field = 'created'
-      struct[0].should.order = 'DSC'
+      struct[0].should.be.Array()
+      struct[0].should.eql(['created', 'DESC'])
 
       struct[1].should.be.Object()
-      struct[1].should.have.properties(['field', 'order'])
-      struct[1].should.field = 'title'
-      struct[1].should.order = 'ASC'
+      struct[1].should.eql(['title', 'ASC'])
 
       struct = sort('')
 

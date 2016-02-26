@@ -20,12 +20,7 @@ describe('netiam', () => {
         offset: 10,
         where: {name: 'test'},
         include: ['campaigns', 'projects'],
-        order: [
-          {
-            field: 'name',
-            order: 'DSC'
-          }
-        ]
+        order: [['name', 'DESC']]
       })
     })
 

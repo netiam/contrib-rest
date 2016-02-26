@@ -45,7 +45,7 @@ export function fields(query) {
 }
 
 const ORDER_ASC = 'ASC'
-const ORDER_DSC = 'DSC'
+const ORDER_DSC = 'DESC'
 
 export function sort(query) {
   if (!query) {
@@ -59,16 +59,10 @@ export function sort(query) {
   return commaSeparatedValues(sort)
     .map(part => {
       if (part[0] === '-') {
-        return {
-          field: part.substring(1),
-          order: ORDER_DSC
-        }
+        return [part.substring(1), ORDER_DSC]
       }
 
-      return {
-        field: part,
-        order: ORDER_ASC
-      }
+      return [part, ORDER_ASC]
     })
 }
 
