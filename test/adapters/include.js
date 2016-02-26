@@ -52,15 +52,39 @@ describe('netiam', () => {
     })
 
     it('should check if path match any include param', () => {
-      isIncluded(User, 'campaigns', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(true)
-      isIncluded(User, 'campaigns.nodes', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(true)
-      isIncluded(User, 'campaigns.nodes.transitions', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(true)
-      isIncluded(User, 'campaigns.nodes.components', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(true)
+      isIncluded(User, 'campaigns', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(true)
+      isIncluded(User, 'campaigns.nodes', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(true)
+      isIncluded(User, 'campaigns.nodes.transitions', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(true)
+      isIncluded(User, 'campaigns.nodes.components', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(true)
 
-      isIncluded(User, 'foo', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(false)
-      isIncluded(User, 'campaigns.foo', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(false)
-      isIncluded(User, 'campaigns.nodes.foo', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(false)
-      isIncluded(User, 'campaigns.foo.components', 'campaigns.nodes.components,campaigns.nodes.transitions').should.eql(false)
+      isIncluded(User, 'foo', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(false)
+      isIncluded(User, 'campaigns.foo', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(false)
+      isIncluded(User, 'campaigns.nodes.foo', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(false)
+      isIncluded(User, 'campaigns.foo.components', [
+        'campaigns.nodes.components',
+        'campaigns.nodes.transitions'
+      ]).should.eql(false)
     })
 
     it('should create include query for path', () => {
@@ -113,9 +137,9 @@ describe('netiam', () => {
     })
 
     it('should filter falsy include values', () => {
-      include(User, 'foo').should.be.Array().of.length(0)
-      include(User, 'foo,').should.be.Array().of.length(0)
-      include(User, 'foo,.bar').should.be.Array().of.length(0)
+      include(User, ['foo']).should.be.Array().of.length(0)
+      include(User, ['foo', '']).should.be.Array().of.length(0)
+      include(User, ['foo', '.bar']).should.be.Array().of.length(0)
     })
 
     it('should create include query for param', () => {
@@ -126,7 +150,7 @@ describe('netiam', () => {
         'campaigns.nodes',
         'campaigns.nodes.components',
         'campaigns.nodes.transitions'
-      ].join(','))
+      ])
 
       query.should.eql([
         {

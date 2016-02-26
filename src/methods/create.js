@@ -45,6 +45,7 @@ export default function({model, req, res}) {
                 )
               })
             )
+            // TODO do we really need to fetch all created instances?
             .then(() => {
               return model.findAll({
                 where: {id: {$in: _.map(documents, document => document.id)}},

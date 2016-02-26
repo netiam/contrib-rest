@@ -105,7 +105,7 @@ export function getAssociationModel(model, path) {
 }
 
 export function isIncluded(model, path, include) {
-  const params = _.filter(include.split(VALUE_SEPARATOR), value => {
+  const params = _.filter(include, value => {
     return hasAssociation(model, value)
   })
 
@@ -172,11 +172,11 @@ function merge(paths, include) {
 }
 
 export function include(model, include) {
-  if (!_.isString(include)) {
-    throw new Error('"include" must be string')
+  if (!_.isArray(include)) {
+    throw new Error('"include" must be an array')
   }
 
-  include = _.filter(include.split(VALUE_SEPARATOR), value => {
+  include = _.filter(include, value => {
     return hasAssociation(model, value)
   })
 
@@ -200,14 +200,15 @@ export function setRelationship({model, document, path, resourceIdentifiers, tra
       transaction
     })
     .then(relatedDocuments => {
-      // TODO sequelize docs say we should be able todo sth like this document.set('projects', documents)
+      // TODO sequelize docs say we should be able todo sth like this document.set('projects', documents), but it did not work?
       switch (associationType) {
         case 'HasOne':
           return document[`set${_.capitalize(path)}`](relatedDocuments.shift(), {transaction})
         case 'HasMany':
+        case 'BelongsToMany':
           return document[`set${_.capitalize(path)}`](relatedDocuments, {transaction})
         default:
-          console.warn('Associations different than "HasOne" and "HasMany" are not supported')
+          console.warn('Associations different than "HasOne", "HasMany" and "BelongsToMany" are not supported')
       }
     })
 }

@@ -7,7 +7,7 @@ export function to({data}) {
   return data
 }
 
-export function convert({documents, model, include = ''}) {
+export function convert({documents, model, include = []}) {
   const included = {}
 
   if (_.isArray(documents)) {

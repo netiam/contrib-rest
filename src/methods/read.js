@@ -9,16 +9,17 @@ import {convert} from '../jsonapi'
 import Promise from 'bluebird'
 
 function fetchAll({model, req, res}) {
-  const query = normalize({req})
-  const includeAttr = [{all: true}].concat(include(model, query.include))
+  const query = normalize(req.query)
+  const originalInclude = query.include
+  if (_.isArray(query.include)) {
+    query.include = [{all: true}].concat(include(model, query.include))
+  } else {
+    query.include = [{all: true}]
+  }
+
   // TODO transaction to ensure COUNT matches response?
   const documents = model
-    .findAll({
-      order: query.order,
-      limit: query.limit,
-      offset: query.offset,
-      include: includeAttr
-    })
+    .findAll(query)
     .then(documents => {
       if (documents.length === 0) {
         return res
@@ -29,7 +30,7 @@ function fetchAll({model, req, res}) {
       res.body = convert({
         documents: _.map(documents, document => document.toJSON()),
         model,
-        include: query.include
+        include: originalInclude
       })
     })
   const count = model
@@ -41,17 +42,22 @@ function fetchAll({model, req, res}) {
 }
 
 function fetchOne({model, idParam, idField, req, res}) {
-  const query = normalize({req})
-  const includeAttr = [{all: true}].concat(include(model, query.include))
+  const query = normalize(req.query)
+  const originalInclude = query.include
+  if (_.isArray(query.include)) {
+    query.include = [{all: true}].concat(include(model, query.include))
+  } else {
+    query.include = [{all: true}]
+  }
 
   // TODO map idField to primaryKeys
   return model
-    .findOne({
-      where: {
-        [idField]: req.params[idParam]
-      },
-      include: includeAttr
-    })
+    .findOne(
+      _.assign(
+        query,
+        {where: {[idField]: req.params[idParam]}}
+      )
+    )
     .then(document => {
       if (!document) {
         // TODO normalize error
@@ -63,7 +69,7 @@ function fetchOne({model, idParam, idField, req, res}) {
       res.body = convert({
         documents: document.toJSON(),
         model,
-        include: query.include
+        include: originalInclude
       })
     })
 }

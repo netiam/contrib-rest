@@ -1,4 +1,5 @@
 import url from 'url'
+import util from 'util'
 import User from '../models/user'
 import {
   setup,
@@ -10,7 +11,7 @@ import {
   include,
   page,
   sort
-} from '../../src/request'
+} from '../../src/params/request'
 
 describe('netiam', () => {
   describe('REST - request parts', () => {
@@ -21,7 +22,7 @@ describe('netiam', () => {
     it('should parse include', () => {
       let struct
 
-      struct = include('comments.author,articles,people')
+      struct = include({include: 'comments.author,articles,people'})
 
       struct.should.be.Array()
       struct.should.have.length(3)
@@ -42,8 +43,10 @@ describe('netiam', () => {
       let struct
 
       struct = fields({
-        articles: 'title,body',
-        people: 'name'
+        fields: {
+          articles: 'title,body',
+          people: 'name'
+        }
       })
 
       struct.should.have.properties(['articles', 'people'])
@@ -75,7 +78,7 @@ describe('netiam', () => {
     it('should parse sort', () => {
       let struct
 
-      struct = sort('-created,title')
+      struct = sort({sort: '-created,title'})
 
       struct.should.be.Array()
       struct.should.have.length(2)
@@ -110,7 +113,9 @@ describe('netiam', () => {
       let struct
 
       struct = page({
-        number: 1
+        page: {
+          number: 1
+        }
       })
 
       struct.should.be.Object()
@@ -118,7 +123,9 @@ describe('netiam', () => {
       struct.offset = 0
 
       struct = page({
-        number: 0
+        page: {
+          number: 0
+        }
       })
 
       struct.should.be.Object()
@@ -126,8 +133,10 @@ describe('netiam', () => {
       struct.offset = 0
 
       struct = page({
-        number: 2,
-        size: 50
+        page: {
+          number: 2,
+          size: 50
+        }
       })
 
       struct.should.be.Object()
@@ -135,8 +144,10 @@ describe('netiam', () => {
       struct.offset = (2 - 1) * 50
 
       struct = page({
-        limit: 22,
-        offset: 15
+        page: {
+          limit: 22,
+          offset: 15
+        }
       })
 
       struct.should.be.Object()
@@ -144,8 +155,10 @@ describe('netiam', () => {
       struct.offset = 15
 
       struct = page({
-        before: 'a',
-        after: 'b'
+        page: {
+          before: 'a',
+          after: 'b'
+        }
       })
 
       struct.should.be.Object()
@@ -182,9 +195,7 @@ describe('netiam', () => {
     it('should parse filter', done => {
       const f = filter('id EQ  \'1\' AND (username EQ \'eliias\' OR birthday GT 1985)')
       User
-        .findAll({
-          where: f.toObject()
-        })
+        .findAll({where: f})
         .then(users => done())
         .catch(done)
     })

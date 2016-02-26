@@ -1,46 +1,48 @@
 import _ from 'lodash'
+import {
+  fields,
+  filter,
+  include,
+  sort,
+  page,
+} from './params/request'
 
-export function normalize({req, idField = 'id', limit = 10}) {
-  if (!req || !req.query) {
-    throw new Error('Either the request object itself or the request.query object does not exist')
+export function normalize(query) {
+  if (!query) {
+    throw new Error('The query object does not exist')
   }
 
-  const query = {
-    filter: '',
-    include: '',
-    order: idField,
-    limit: limit,
+  const q = {
+    limit: 10,
     offset: 0
   }
 
+  // Fields
+  //q.fields = fields(query)
+
   // Filter
-  if (req.query.filter) {
-    query.filter = req.query.filter
-  }
+  q.where = filter(query)
 
-  // Embeded documents
-  if (req.query.include) {
-    query.include = req.query.include
-  }
-
-  // Order
-  if (req.query.order) {
-    query.order = req.query.order
-  }
+  // Include
+  q.include = include(query)
 
   // Pagination
-  if (req.query.offset) {
-    query.offset = Number(req.query.offset)
-  }
+  _.assign(q, page(query))
 
-  if (req.query.limit) {
-    query.limit = Number(req.query.limit)
-  }
+  // Order
+  q.order = sort(query)
 
-  if (query.page) {
-    query.page = req.query.page ? Number(req.query.page) : 1
-    query.offset = Math.max(0, (query.page - 1) * query.limit)
-  }
+  return _.pickBy(q, val => {
+    if (_.isNumber(val)) {
+      return true
+    }
 
-  return Object.freeze(query)
+    if (_.isBoolean(val)) {
+      return true
+    }
+
+    if (!_.isEmpty(val)) {
+      return true
+    }
+  })
 }

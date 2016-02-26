@@ -69,7 +69,7 @@ describe('netiam', () => {
     })
 
     it('queries all users including no associations', done => {
-      const includeParam = ''
+      const includeParam = ['']
       const inc = [{all: true}].concat(include(User, includeParam))
 
       User
@@ -120,7 +120,7 @@ describe('netiam', () => {
     })
 
     it('queries all users including falsy associations', done => {
-      const includeParam = 'foo'
+      const includeParam = ['foo']
       const inc = [{all: true}].concat(include(User, includeParam))
 
       User
@@ -171,7 +171,7 @@ describe('netiam', () => {
     })
 
     it('queries all users including all associations', done => {
-      const includeParam = 'projects,campaigns,profile'
+      const includeParam = ['projects', 'campaigns', 'profile']
       const inc = [{all: true}].concat(include(User, includeParam))
 
       User
@@ -238,7 +238,7 @@ describe('netiam', () => {
           const json = convert({
             documents: document,
             model: User,
-            include: 'projects,campaigns,profile'
+            include: ['projects', 'campaigns', 'profile']
           })
 
           json.should.have.properties(['data', 'included'])
