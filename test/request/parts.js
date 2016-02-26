@@ -159,15 +159,12 @@ describe('netiam', () => {
 
       struct.should.be.Object()
       struct.should.have.property('where')
-      struct.where.should.have.property('$and')
+      struct.where.should.have.property('id')
 
-      struct.where.$and.should.be.Array()
-
-      struct.where.$and[0].should.have.property('lt')
-      struct.where.$and[0].lt.should.eql('a')
-
-      struct.where.$and[1].should.have.property('gt')
-      struct.where.$and[1].gt.should.eql('b')
+      struct.where.id.should.be.Object()
+      struct.where.id.should.have.properties(['$lt', '$gt'])
+      struct.where.id.$lt.should.eql('a')
+      struct.where.id.$gt.should.eql('b')
 
       struct = page({})
 

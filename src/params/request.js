@@ -106,13 +106,33 @@ export function page(query) {
     return {offset: Number(page.offset)}
   }
 
-  if (page.before && page.after) {
-    return {
-      where: {
-        $and: [
-          {lt: String(page.before)},
-          {gt: String(page.after)}
-        ]
+  if (page.before || page.after) {
+    if (page.before && page.after) {
+      return {
+        where: {
+          id: {
+            $lt: String(page.before),
+            $gt: String(page.after)
+          }
+        }
+      }
+    }
+    if (page.before) {
+      return {
+        where: {
+          id: {
+            $lt: String(page.before)
+          }
+        }
+      }
+    }
+    if (page.after) {
+      return {
+        where: {
+          id: {
+            $tt: String(page.after)
+          }
+        }
       }
     }
   }
