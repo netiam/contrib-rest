@@ -80,7 +80,7 @@ describe('netiam', () => {
               json.profile.should.be.Object()
               json.profile.UserId.should.eql(user.id)
               json.projects.should.be.Array()
-              json.projects[0].UserId.should.eql(user.id)
+              json.projects[0].ownerId.should.eql(user.id)
             })
         })
         .then(() => done())

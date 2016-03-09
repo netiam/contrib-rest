@@ -23,7 +23,7 @@ const User = db.define('User', {
 })
 
 User.hasMany(Campaign, {as: 'campaigns'})
-User.hasMany(Project, {as: 'projects'})
+User.hasMany(Project, {as: 'projects', foreignKey: 'ownerId'})
 User.hasOne(Profile, {as: 'profile'})
 
 Project.belongsTo(User, {as: 'owner'})

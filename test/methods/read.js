@@ -179,8 +179,8 @@ describe('netiam', () => {
             'projects'
           ])
           json.included.should.be.Array()
-          json.included.should.have.length(1)
-          json.included[0].type.should.eql('project')
+          json.included.should.have.length(2)
+          json.included[1].type.should.eql('project')
         })
         .end(done)
     })

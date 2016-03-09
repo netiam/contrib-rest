@@ -1,6 +1,11 @@
 import request from 'supertest'
+import util from 'util'
 import uuid from 'uuid'
 import appMock from '../utils/app'
+import Campaign from '../models/campaign'
+import campaignFixture from '../fixtures/user'
+import Project from '../models/project'
+import projectFixture from '../fixtures/project'
 import userFixture from '../fixtures/user'
 import userUpdateFixture from '../fixtures/user-update.jsonapi'
 import User from '../models/user'
@@ -36,19 +41,17 @@ describe('netiam', () => {
     after(teardown)
 
     it('should create a user', done => {
-      User
-        .create(userFixture)
-        .then(user => {
-          user.get({plain: true}).should.have.properties([
-            'id',
-            'email',
-            'username',
-            'birthday',
-            'createdAt',
-            'updatedAt'
-          ])
-          done()
+      const campaign = Campaign.create(campaignFixture)
+      const project = Project.create(projectFixture)
+      const user = User.create(userFixture)
+
+      Promise
+        .all([user, campaign, project])
+        .then(documents => {
+          const [user, campaign] = documents
+          return user.setCampaigns([campaign])
         })
+        .then(() => done())
         .catch(done)
     })
 
@@ -91,6 +94,7 @@ describe('netiam', () => {
             'campaigns',
             'projects'
           ])
+          // TODO Check resource-identifiers of campaigns and projects
         })
         .end(done)
     })
