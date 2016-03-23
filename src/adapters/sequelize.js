@@ -203,6 +203,7 @@ export function setRelationship({model, document, path, resourceIdentifiers, tra
       // TODO sequelize docs say we should be able todo sth like this document.set('projects', documents), but it did not work?
       switch (associationType) {
         case 'HasOne':
+        case 'BelongsTo':
           return document[`set${_.capitalize(path)}`](relatedDocuments.shift(), {transaction})
         case 'HasMany':
         case 'BelongsToMany':
