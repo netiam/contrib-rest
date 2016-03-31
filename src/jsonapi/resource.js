@@ -45,5 +45,5 @@ export default function resource(baseModel, model, document, include, included, 
     resourceObject.relationships = relationships
   }
 
-  return Object.freeze(resourceObject)
+  return resourceObject
 }
