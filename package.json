@@ -24,13 +24,13 @@
     "sequelize": "^3.17.3"
   },
   "devDependencies": {
-    "babel-cli": "^6.2.0",
-    "babel-eslint": "^5.0.0",
+    "babel-cli": "^6.6.4",
+    "babel-eslint": "^6.0.0",
     "babel-preset-es2015-node5": "^1.1.2",
     "body-parser": "^1.14.1",
     "codeclimate-test-reporter": "0.3.1",
     "continuation-local-storage": "^3.1.6",
-    "eslint": "2.2.0",
+    "eslint": "2.4.0",
     "express": "^4.13.4",
     "istanbul": "0.4.2",
     "jsonapi-validator": "^1.0.1",
