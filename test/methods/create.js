@@ -3,11 +3,14 @@ import util from 'util'
 import appMock from '../utils/app'
 import profileFixture from '../fixtures/profile'
 import projectFixture from '../fixtures/project'
+import teamFixture from '../fixtures/team'
 import userFixture from '../fixtures/user.jsonapi'
 import userWithProfileFixture from '../fixtures/user+profile.jsonapi'
+import userWithTeamFixture from '../fixtures/user+team.jsonapi'
 import usersFixture from '../fixtures/users.jsonapi'
 import Profile from '../models/profile'
 import Project from '../models/project'
+import Team from '../models/team'
 import User from '../models/user'
 import {
   setup,
@@ -48,6 +51,13 @@ describe('netiam', () => {
     it('should create profile', done => {
       Profile
         .create(profileFixture)
+        .then(() => done())
+        .catch(done)
+    })
+
+    it('should create team', done => {
+      Team
+        .create(teamFixture)
         .then(() => done())
         .catch(done)
     })
@@ -98,6 +108,7 @@ describe('netiam', () => {
         .expect('Content-Type', /json/)
         .expect(res => {
           const json = res.body
+
           json.should.have.properties(['data', 'included'])
           json.data.should.be.Object()
           json.data.should.have.properties([
@@ -130,6 +141,45 @@ describe('netiam', () => {
           ])
           json.data.relationships.profile.data.id.should.be.String()
           json.data.relationships.profile.data.type.should.eql('profile')
+        })
+        .end(done)
+    })
+
+    it('should create a user and assign to team', done => {
+      request(app)
+        .post('/users')
+        .set('Content-Type', 'application/vnd.api+json')
+        .set('Accept', 'application/vnd.api+json')
+        .send(JSON.stringify(userWithTeamFixture))
+        .expect(201)
+        .expect('Content-Type', /json/)
+        .expect(res => {
+          const json = res.body
+          process.exit()
+          json.should.have.properties(['data', 'included'])
+          json.data.should.be.Object()
+          json.data.should.have.properties([
+            'id',
+            'type',
+            'attributes'
+          ])
+          json.data.id.should.be.String()
+          json.data.id.should.have.length(36)
+          json.data.type.should.be.String()
+          json.data.type.should.eql('user')
+          json.data.attributes.should.be.Object()
+          json.data.attributes.should.have.properties([
+            'email',
+            'username',
+            'birthday',
+            'createdAt',
+            'updatedAt'
+          ])
+          json.data.attributes.email.should.eql('test+team@neti.am')
+          json.data.attributes.username.should.eql('user+team')
+
+          json.data.relationships.should.be.Object()
+          json.data.relationships.should.have.properties(['team'])
         })
         .end(done)
     })

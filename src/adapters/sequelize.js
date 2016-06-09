@@ -25,9 +25,9 @@ export function properties(model, document) {
     const associationType = association.associationType
     switch (associationType) {
       case 'BelongsTo':
-      case 'HasOne':
         attributes[association.foreignKey] = relationship.data.id
         return
+      case 'HasOne':
       case 'HasMany':
       case 'BelongsToMany':
         return

@@ -32,18 +32,28 @@ export default function({model, req, res}) {
                 if (!_.has(post, 'relationships')) {
                   return Promise.resolve()
                 }
-                // TODO as `BelongsTo` and `HasOne` relationships are set directly
-                // TODO w/ attributes now, we should avoid any double `setRelationship`
-                // TODO calls for those kind of associations
 
                 return Promise.all(
                   _.map(post.relationships, (relationship, path) => {
-                    return adapter.setRelationship({
-                      model,
-                      document,
-                      path,
-                      resourceIdentifiers: relationship.data
-                    })
+                    // TODO as `BelongsTo` and `HasOne` relationships are set directly
+                    // TODO w/ attributes now, we should avoid any double `setRelationship`
+                    // TODO calls for those kind of associations
+                    const associationType = model.associations[path].associationType
+                    switch (associationType) {
+                      case 'BelongsTo':
+                        return Promise.resolve()
+                      case 'HasOne':
+                      case 'HasMany':
+                      case 'BelongsToMany':
+                        return adapter.setRelationship({
+                          model,
+                          document,
+                          path,
+                          resourceIdentifiers: relationship.data
+                        })
+                      default:
+                        console.warn('Associations different than "HasOne", "BelongsTo", "HasMany" and "BelongsToMany" are not supported')
+                    }
                   })
                 )
               })
