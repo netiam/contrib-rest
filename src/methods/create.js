@@ -17,12 +17,12 @@ export default function({model, req, res}) {
     data = [data]
   }
 
-  const attributes = _.map(data, document => document.attributes)
+  const properties = _.map(data, document => adapter.properties(model, document))
 
   return model.sequelize
     .transaction(() => {
       return model
-        .bulkCreate(attributes)
+        .bulkCreate(properties)
         // FIXME: workaround for http://docs.sequelizejs.com/en/latest/api/model/#bulkcreaterecords-options-promisearrayinstance
         .then(documents => {
           return Promise
