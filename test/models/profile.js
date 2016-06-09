@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize'
 import {db} from '../utils/db'
 
-const Project = db.define('Profile', {
+const Profile = db.define('Profile', {
   id: {
     type: Sequelize.UUID,
     primaryKey: true,
@@ -10,4 +10,4 @@ const Project = db.define('Profile', {
   }
 })
 
-export default Project
+export default Profile
