@@ -32,6 +32,9 @@ export default function({model, req, res}) {
                 if (!_.has(post, 'relationships')) {
                   return Promise.resolve()
                 }
+                // TODO as `BelongsTo` and `HasOne` relationships are set directly
+                // TODO w/ attributes now, we should avoid any double `setRelationship`
+                // TODO calls for those kind of associations
 
                 return Promise.all(
                   _.map(post.relationships, (relationship, path) => {
