@@ -17,6 +17,27 @@ export function idQuery(model, id) {
   return _.zipObject(fields, values)
 }
 
+export function properties(model, document) {
+  const attributes = document.attributes
+  const relationshipData = relationships(model, document.relationships)
+  _.forEach(relationshipData, (relationship, path) => {
+    const association = model.associations[path]
+    const associationType = association.associationType
+    switch (associationType) {
+      case 'BelongsTo':
+      case 'HasOne':
+        attributes[association.foreignKey] = relationship.data.id
+        return
+      case 'HasMany':
+      case 'BelongsToMany':
+        return
+      default:
+        console.warn('Associations different than "HasOne", "BelongsTo", "HasMany" and "BelongsToMany" are not supported')
+    }
+  })
+  return attributes
+}
+
 function primaryKeys(model) {
   return _.keys(model.primaryKeys)
 }
@@ -56,15 +77,13 @@ function relationshipKeys(model) {
   return _.keys(model.associations)
 }
 
-export function relationships(model, document) {
+export function relationships(model, relationshipsMap) {
   const relationships = {}
   const keys = relationshipKeys(model)
   _.forEach(keys, key => {
-    if (!document[key]) {
-      return
+    if (_.has(relationshipsMap, key)) {
+      relationships[key] = relationshipsMap[key]
     }
-
-    relationships[key] = document[key]
   })
   return relationships
 }
@@ -209,7 +228,7 @@ export function setRelationship({model, document, path, resourceIdentifiers, tra
         case 'BelongsToMany':
           return document[`set${_.capitalize(path)}`](relatedDocuments, {transaction})
         default:
-          console.warn('Associations different than "HasOne", "HasMany" and "BelongsToMany" are not supported')
+          console.warn('Associations different than "HasOne", "BelongsTo", "HasMany" and "BelongsToMany" are not supported')
       }
     })
 }

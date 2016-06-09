@@ -5,6 +5,8 @@ import {
 
   idQuery,
 
+  properties,
+
   id,
   type,
   attributes,
@@ -26,6 +28,8 @@ export default Object.freeze({
   VALUE_SEPARATOR,
 
   idQuery,
+
+  properties,
 
   id,
   type,
