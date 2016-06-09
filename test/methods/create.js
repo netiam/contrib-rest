@@ -4,6 +4,7 @@ import appMock from '../utils/app'
 import profileFixture from '../fixtures/profile'
 import projectFixture from '../fixtures/project'
 import userFixture from '../fixtures/user.jsonapi'
+import userWithProfileFixture from '../fixtures/user+profile.jsonapi'
 import usersFixture from '../fixtures/users.jsonapi'
 import Profile from '../models/profile'
 import Project from '../models/project'
@@ -83,6 +84,52 @@ describe('netiam', () => {
           ])
           json.data.attributes.email.should.eql('hannes@impossiblearts.com')
           json.data.attributes.username.should.eql('eliias')
+        })
+        .end(done)
+    })
+
+    it('should create a user w/ profile', done => {
+      request(app)
+        .post('/users')
+        .set('Content-Type', 'application/vnd.api+json')
+        .set('Accept', 'application/vnd.api+json')
+        .send(JSON.stringify(userWithProfileFixture))
+        .expect(201)
+        .expect('Content-Type', /json/)
+        .expect(res => {
+          const json = res.body
+          json.should.have.properties(['data', 'included'])
+          json.data.should.be.Object()
+          json.data.should.have.properties([
+            'id',
+            'type',
+            'attributes'
+          ])
+          json.data.id.should.be.String()
+          json.data.id.should.have.length(36)
+          json.data.type.should.be.String()
+          json.data.type.should.eql('user')
+          json.data.attributes.should.be.Object()
+          json.data.attributes.should.have.properties([
+            'email',
+            'username',
+            'birthday',
+            'createdAt',
+            'updatedAt'
+          ])
+          json.data.attributes.email.should.eql('test+profile@neti.am')
+          json.data.attributes.username.should.eql('user+profile')
+
+          json.data.relationships.should.be.Object()
+          json.data.relationships.should.have.properties(['profile'])
+          json.data.relationships.profile.should.be.Object()
+          json.data.relationships.profile.data.should.be.Object()
+          json.data.relationships.profile.data.should.have.properties([
+            'id',
+            'type'
+          ])
+          json.data.relationships.profile.data.id.should.be.String()
+          json.data.relationships.profile.data.type.should.eql('profile')
         })
         .end(done)
     })
