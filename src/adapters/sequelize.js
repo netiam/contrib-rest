@@ -21,6 +21,10 @@ export function properties(model, document) {
   const attributes = document.attributes
   const relationshipData = relationships(model, document.relationships)
   _.forEach(relationshipData, (relationship, path) => {
+    if (!relationship.data) {
+      return
+    }
+
     const association = model.associations[path]
     const associationType = association.associationType
     switch (associationType) {
