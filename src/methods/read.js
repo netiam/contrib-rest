@@ -21,11 +21,6 @@ function fetchAll({model, req, res}) {
   const documents = model
     .findAll(query)
     .then(documents => {
-      if (documents.length === 0) {
-        return res
-          .status(204)
-          .send()
-      }
       res.status(200)
       res.body = convert({
         documents: _.map(documents, document => document.toJSON()),

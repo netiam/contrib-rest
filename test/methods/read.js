@@ -54,6 +54,23 @@ describe('netiam', () => {
     before(setup)
     after(teardown)
 
+    it('should return empty list', done => {
+      request(app)
+        .get('/users')
+        .set('Accept', 'application/json')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => {
+          const json = res.body
+
+          json.should.be.an.Object()
+          json.should.have.properties(['data'])
+          json.data.should.be.Array()
+          json.data.should.have.length(0)
+        })
+        .end(done)
+    })
+
     it('should create a user', done => {
       const project = Project.create(projectFixture)
       const campaign = Campaign.create(campaignFixture)
