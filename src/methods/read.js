@@ -34,7 +34,7 @@ function fetchAll({model, req, res}) {
       })
     })
   const count = model
-    .count()
+    .count({where: query.where})
     .then(count => {
       res.meta = Object.assign({}, res.meta, {count})
     })
