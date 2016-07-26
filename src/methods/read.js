@@ -18,22 +18,24 @@ function fetchAll({model, req, res}) {
   }
 
   // TODO transaction to ensure COUNT matches response?
-  const documents = model
-    .findAll(query)
-    .then(documents => {
-      res.status(200)
-      res.body = convert({
-        documents: _.map(documents, document => document.toJSON()),
-        model,
-        include: originalInclude
+  return model.sequelize.transaction(() => {
+    const documents = model
+      .findAll(query)
+      .then(documents => {
+        res.status(200)
+        res.body = convert({
+          documents: _.map(documents, document => document.toJSON()),
+          model,
+          include: originalInclude
+        })
       })
-    })
-  const count = model
-    .count({where: query.where})
-    .then(count => {
-      res.meta = Object.assign({}, res.meta, {count})
-    })
-  return Promise.all([documents, count])
+    const count = model
+      .count({where: query.where})
+      .then(count => {
+        res.meta = Object.assign({}, res.meta, {count})
+      })
+    return Promise.all([documents, count])
+  })
 }
 
 function fetchOne({model, idParam, idField, req, res}) {
