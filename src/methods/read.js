@@ -17,7 +17,6 @@ function fetchAll({model, req, res}) {
     query.include = [{all: true}]
   }
 
-  // TODO transaction to ensure COUNT matches response?
   return model.sequelize.transaction(() => {
     const documents = model
       .findAll(query)
