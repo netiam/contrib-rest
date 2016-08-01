@@ -33,7 +33,7 @@
     "express": "^4.13.4",
     "istanbul": "0.4.4",
     "jsonapi-validator": "^2.0.0",
-    "mocha": "^2.5.0",
+    "mocha": "^3.0.0",
     "qs": "^6.1.0",
     "semantic-release": "4.3.5",
     "should": "^10.0.0",
