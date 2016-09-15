@@ -1,4 +1,8 @@
-export default function({model, idParam, idField, req, res}) {
+import {apply as applyScope} from '../scope'
+
+export default function({model, scopes, idParam, idField, req, res}) {
+  model = applyScope(model, scopes, req, res)
+
   return model.sequelize
     .transaction(() => {
       return model

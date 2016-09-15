@@ -20,10 +20,21 @@ const User = db.define('User', {
     unique: true
   },
   birthday: Sequelize.DATE
+}, {
+  scopes: {
+    byEmail: function(req) {
+      return {
+        where: {email: req.query.email}
+      }
+    }
+  }
 })
 
 User.hasMany(Campaign, {as: 'campaigns'})
-User.hasMany(Project, {as: 'projects', foreignKey: 'ownerId'})
+User.hasMany(Project, {
+  as: 'projects',
+  foreignKey: 'ownerId'
+})
 User.hasOne(Profile, {as: 'profile'})
 
 Project.belongsTo(User, {as: 'owner'})

@@ -1,13 +1,10 @@
 import request from 'supertest'
-import uuid from 'uuid'
-import util from 'util'
 import appMock from '../utils/app'
 import campaignFixture from '../fixtures/campaign'
 import componentFixture from '../fixtures/component'
 import nodeFixture from '../fixtures/node'
 import projectFixture from '../fixtures/project'
 import transitionFixture from '../fixtures/transition'
-import userFixture from '../fixtures/user'
 import Campaign from '../models/campaign'
 import Component from '../models/component'
 import Node from '../models/node'
@@ -23,11 +20,26 @@ import rest from '../../src/rest'
 let user
 
 const plugin = rest({model: User})
+const pluginWithScope = rest({
+  model: User,
+  scopes: ['defaultScope', 'byEmail']
+})
 
 const app = appMock()
 
 app.get('/users', function(req, res) {
   plugin(req, res)
+    .then(() => res.json(res.body))
+    .catch(err => {
+      console.log(err)
+      res
+        .status(500)
+        .json(err)
+    })
+})
+
+app.get('/users-with-scope', function(req, res) {
+  pluginWithScope(req, res)
     .then(() => res.json(res.body))
     .catch(err => {
       console.log(err)
@@ -291,6 +303,44 @@ describe('netiam', () => {
           json.included[1].type.should.eql('transition')
           json.included[2].type.should.eql('node')
           json.included[3].type.should.eql('campaign')
+        })
+        .end(done)
+    })
+
+    it('should get users w/ applied scope', done => {
+      request(app)
+        .get(`/users-with-scope?email=hannes@impossiblearts.com`)
+        .set('Accept', 'application/json')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(res => {
+          const json = res.body
+
+          json.should.be.an.Object()
+          json.should.have.properties(['data', 'included'])
+          json.data.should.be.Array()
+          json.data.should.have.length(1)
+          json.data[0].should.be.Object()
+          json.data[0].should.have.properties([
+            'id',
+            'type',
+            'attributes',
+            'relationships'
+          ])
+          json.data[0].id.should.be.String()
+          json.data[0].id.should.have.length(36)
+          json.data[0].type.should.be.String()
+          json.data[0].type.should.eql('user')
+          json.data[0].attributes.should.be.Object()
+          json.data[0].attributes.should.have.properties([
+            'email',
+            'username',
+            'birthday',
+            'createdAt',
+            'updatedAt'
+          ])
+          json.data[0].attributes.email.should.eql('hannes@impossiblearts.com')
+          json.data[0].attributes.username.should.eql('eliias')
         })
         .end(done)
     })

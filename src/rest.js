@@ -1,5 +1,3 @@
-import Promise from 'bluebird'
-import Sequelize from 'sequelize'
 import {HAS_MANY} from './relationships'
 import create from './methods/create'
 import read from './methods/read'
@@ -10,6 +8,7 @@ export default function({
   model,
   idField = 'id',
   idParam = 'id',
+  scopes = ['defaultScope'],
   relationship} = {}) {
 
   return function(req, res) {
@@ -32,6 +31,7 @@ export default function({
     if (method === 'GET' && isList) {
       return read({
         model,
+        scopes,
         relationship,
         req,
         res
@@ -41,6 +41,7 @@ export default function({
     if (method === 'POST') {
       return create({
         model,
+        scopes,
         relationship,
         req,
         res
@@ -50,6 +51,7 @@ export default function({
     if (method === 'GET') {
       return read({
         model,
+        scopes,
         idField,
         idParam,
         relationship,
@@ -61,6 +63,7 @@ export default function({
     if (method === 'HEAD') {
       return read({
         model,
+        scopes,
         idField,
         idParam,
         relationship,
@@ -72,6 +75,7 @@ export default function({
     if (method === 'PATCH' || method === 'PUT') {
       return update({
         model,
+        scopes,
         idField,
         idParam,
         relationship,
@@ -83,6 +87,7 @@ export default function({
     if (method === 'DELETE') {
       return del({
         model,
+        scopes,
         idField,
         idParam,
         relationship,

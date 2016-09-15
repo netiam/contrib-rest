@@ -59,7 +59,7 @@ export function type(model) {
 function foreignKeys(model) {
   return _.reject(
     _.map(model.attributes, (attribute, key) => {
-      return _.has(attribute, 'references') ? key : undefined
+      return _.hasIn(attribute, 'references') ? key : undefined
     }),
     _.isEmpty
   )
@@ -85,7 +85,7 @@ export function relationships(model, relationshipsMap) {
   const relationships = {}
   const keys = relationshipKeys(model)
   _.forEach(keys, key => {
-    if (_.has(relationshipsMap, key)) {
+    if (_.hasIn(relationshipsMap, key)) {
       relationships[key] = relationshipsMap[key]
     }
   })
@@ -104,7 +104,7 @@ export function hasAssociation(model, path) {
   while (parts.length > 0) {
     part = parts.shift()
     const target = `associations.${part}.target`
-    if (!_.has(model, target)) {
+    if (!_.hasIn(model, target)) {
       result = false
       break
     }
@@ -118,7 +118,7 @@ export function getAssociationModel(model, path) {
   let part
   while (part = parts.shift()) {
     const target = `associations.${part}.target`
-    if (!_.has(model, target)) {
+    if (!_.hasIn(model, target)) {
       throw new Error('Association does not exist')
     }
     model = _.get(model, target)

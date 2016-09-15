@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
+import {apply as applyScope} from '../scope'
 import validate from '../validator'
 import schema from '../validator/schema/create.json'
 import {
@@ -7,7 +8,7 @@ import {
 } from '../jsonapi'
 import adapter from '../adapters'
 
-export default function({model, req, res}) {
+export default function({model, scopes, req, res}) {
   if (!validate(schema, req.body)) {
     return Promise.reject(
       new Error('Request body must be a valid JSON API object'))
@@ -18,6 +19,8 @@ export default function({model, req, res}) {
   }
 
   const properties = _.map(data, document => adapter.properties(model, document))
+
+  model = applyScope(model, scopes, req, res)
 
   return model.sequelize
     .transaction(() => {

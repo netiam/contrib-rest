@@ -2,13 +2,14 @@ import _ from 'lodash'
 import {
   normalize
 } from '../params'
+import {apply as applyScope} from '../scope'
 import {
   include
 } from '../adapters/sequelize'
 import {convert} from '../jsonapi'
 import Promise from 'bluebird'
 
-function fetchAll({model, req, res}) {
+function fetchAll({model, scopes, req, res}) {
   const query = normalize(req.query)
   const originalInclude = query.include
   if (_.isArray(query.include)) {
@@ -16,6 +17,8 @@ function fetchAll({model, req, res}) {
   } else {
     query.include = [{all: true}]
   }
+
+  model = applyScope(model, scopes, req, res)
 
   return model.sequelize.transaction(() => {
     const documents = model
@@ -37,7 +40,7 @@ function fetchAll({model, req, res}) {
   })
 }
 
-function fetchOne({model, idParam, idField, req, res}) {
+function fetchOne({model, scopes, idParam, idField, req, res}) {
   const query = normalize(req.query)
   const originalInclude = query.include
   if (_.isArray(query.include)) {
@@ -45,6 +48,8 @@ function fetchOne({model, idParam, idField, req, res}) {
   } else {
     query.include = [{all: true}]
   }
+
+  model = applyScope(model, scopes, req, res)
 
   // TODO map idField to primaryKeys
   return model
@@ -70,10 +75,11 @@ function fetchOne({model, idParam, idField, req, res}) {
     })
 }
 
-export default function({model, idParam, idField, req, res}) {
+export default function({model, scopes, idParam, idField, req, res}) {
   if (idParam && idField) {
     return fetchOne({
       model,
+      scopes,
       idParam,
       idField,
       req,
@@ -83,6 +89,7 @@ export default function({model, idParam, idField, req, res}) {
 
   return fetchAll({
     model,
+    scopes,
     req,
     res
   })

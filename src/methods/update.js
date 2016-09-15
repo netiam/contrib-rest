@@ -2,6 +2,7 @@ import _ from 'lodash'
 import Promise from 'bluebird'
 import validate from '../validator'
 import schema from '../validator/schema/update.json'
+import {apply as applyScope} from '../scope'
 import {convert} from '../jsonapi'
 import adapter from '../adapters'
 
@@ -29,13 +30,15 @@ function updateRelationships(model, document, relationships) {
     .then(() => document)
 }
 
-export default function({model, idField, idParam, req, res}) {
+export default function({model, scopes, idField, idParam, req, res}) {
   if (!validate(schema, req.body)) {
     return Promise.reject(
       new Error('Request body must be a valid JSON API object'))
   }
 
   const data = req.body.data
+
+  model = applyScope(model, scopes, req, res)
 
   return model.sequelize
     .transaction(() => {
