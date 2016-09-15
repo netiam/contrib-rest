@@ -24,21 +24,21 @@
     "sequelize": "^3.23.6"
   },
   "devDependencies": {
-    "babel-cli": "^6.7.7",
+    "babel-cli": "^6.14.0",
     "babel-preset-es2015-node5": "^1.1.2",
     "body-parser": "^1.14.1",
     "codeclimate-test-reporter": "0.3.3",
     "continuation-local-storage": "^3.1.6",
-    "eslint": "3.1.1",
+    "eslint": "3.5.0",
     "express": "^4.13.4",
-    "istanbul": "0.4.4",
+    "istanbul": "0.4.5",
     "jsonapi-validator": "^2.0.0",
-    "mocha": "^2.5.0",
+    "mocha": "^3.0.0",
     "qs": "^6.1.0",
     "semantic-release": "4.3.5",
-    "should": "^10.0.0",
+    "should": "^11.0.0",
     "sqlite3": "^3.1.4",
-    "supertest": "1.2.0",
+    "supertest": "2.0.0",
     "uuid": "^2.0.1"
   },
   "repository": {
