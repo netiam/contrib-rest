@@ -39,7 +39,7 @@
     "should": "^11.0.0",
     "sqlite3": "^3.1.4",
     "supertest": "2.0.1",
-    "uuid": "^2.0.1"
+    "uuid": "^3.0.0"
   },
   "repository": {
     "type": "git",
