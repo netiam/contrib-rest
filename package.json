@@ -21,7 +21,7 @@
     "is-my-json-valid": "^2.13.0",
     "lodash": "^4.16.1",
     "netiam-filter": "^1.2.0",
-    "sequelize": "^3.24.5"
+    "sequelize": "^4.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
