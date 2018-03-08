@@ -34,7 +34,7 @@
     "jsonapi-validator": "^3.0.0",
     "mocha": "^5.0.0",
     "qs": "^6.1.0",
-    "semantic-release": "12.4.1",
+    "semantic-release": "15.0.0",
     "sequelize": "^3.30.4",
     "should": "^13.1.0",
     "sqlite3": "^3.1.4",
