@@ -63,7 +63,6 @@ describe('netiam', () => {
             })
             .then(user => {
               const json = user.toJSON()
-
               json.should.be.Object()
               json.should.have.properties([
                 'id',
@@ -78,7 +77,7 @@ describe('netiam', () => {
               json.email.should.eql('hannes@impossiblearts.com')
               json.username.should.eql('eliias')
               json.profile.should.be.Object()
-              json.profile.UserId.should.eql(user.id)
+              json.profile.profileId.should.eql(user.id)
               json.projects.should.be.Array()
               json.projects[0].ownerId.should.eql(user.id)
             })

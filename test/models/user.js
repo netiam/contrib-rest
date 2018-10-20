@@ -36,7 +36,6 @@ User.hasMany(Project, {
   foreignKey: 'ownerId'
 })
 User.hasOne(Profile, {as: 'profile'})
-
 Project.belongsTo(User, {as: 'owner'})
 
 export default User

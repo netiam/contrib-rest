@@ -130,7 +130,7 @@ export function page(query) {
       return {
         where: {
           id: {
-            $tt: String(page.after)
+            $gt: String(page.after)
           }
         }
       }

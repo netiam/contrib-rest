@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import Promise from 'bluebird'
 import util from 'util'
+import {Op} from 'sequelize'
 
 export const ID_SEPARATOR = '--'
 export const PATH_SEPARATOR = '.'
@@ -11,7 +11,8 @@ export function idQuery(model, id) {
   const values = id.split(ID_SEPARATOR)
 
   if (fields.length !== values.length) {
-    throw new Error('The number of ID parameter values does not match the number of ID fields')
+    throw new Error(
+      'The number of ID parameter values does not match the number of ID fields')
   }
 
   return _.zipObject(fields, values)
@@ -36,7 +37,8 @@ export function properties(model, document) {
       case 'BelongsToMany':
         return
       default:
-        console.warn('Associations different than "HasOne", "BelongsTo", "HasMany" and "BelongsToMany" are not supported')
+        console.warn(
+          'Associations different than "HasOne", "BelongsTo", "HasMany" and "BelongsToMany" are not supported')
     }
   })
   return attributes
@@ -215,11 +217,12 @@ export function setRelationship({model, document, path, resourceIdentifiers, tra
   const associationModel = getAssociationModel(model, path)
 
   // TODO support composite primary keys
-  const ids = _.map(resourceIdentifiers, resourceIdentifier => resourceIdentifier.id)
+  const ids = _.map(resourceIdentifiers,
+    resourceIdentifier => resourceIdentifier.id)
   const associationType = model.associations[path].associationType
   return associationModel
     .findAll({
-      where: {id: {$in: ids}},
+      where: {id: {[Op.in]: ids}},
       transaction
     })
     .then(relatedDocuments => {
@@ -227,12 +230,15 @@ export function setRelationship({model, document, path, resourceIdentifiers, tra
       switch (associationType) {
         case 'HasOne':
         case 'BelongsTo':
-          return document[`set${_.capitalize(path)}`](relatedDocuments.shift(), {transaction})
+          return document[`set${_.capitalize(path)}`](relatedDocuments.shift(),
+            {transaction})
         case 'HasMany':
         case 'BelongsToMany':
-          return document[`set${_.capitalize(path)}`](relatedDocuments, {transaction})
+          return document[`set${_.capitalize(path)}`](relatedDocuments,
+            {transaction})
         default:
-          console.warn('Associations different than "HasOne", "BelongsTo", "HasMany" and "BelongsToMany" are not supported')
+          console.warn(
+            'Associations different than "HasOne", "BelongsTo", "HasMany" and "BelongsToMany" are not supported')
       }
     })
 }
